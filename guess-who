@@ -1,0 +1,130 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use Mojolicious::Lite;
+use Mojo::JSON;
+
+my %game;
+
+get '/new-game' => sub {
+    my $self = shift;
+
+    my $gameid = new_game();
+
+    $self->stash(gameid => $gameid);
+
+    $self->render('game');
+};
+
+get '/join-game/:gameid' => sub {
+    my $self = shift;
+
+    my $gameid = $self->param('gameid');
+
+    if (!$game{$gameid} || $game{$gameid}{state} ne 'join') {
+        $self->render(text => 'Nope.');
+        return;
+    }
+
+    $game{$gameid}{state} = 'player0';
+    $self->stash(gameid => $gameid);
+    $self->render('game');
+};
+
+websocket '/game/:gameid' => sub {
+    my $self = shift;
+
+    my $gameid = $self->param('gameid');
+
+    if (!$game{$gameid} || $game{$gameid}{ws_state} ne 'join') {
+        return;
+    }
+
+    push @{ $game{$gameid}{websockets} }, $self;
+
+    $self->on(message => sub {
+        my ($self, $msg) = @_;
+
+        print STDERR "Received message: $msg\n";
+
+        if ($game{$gameid}{ws_state} ne 'play') {
+            return;
+        }
+
+        $game{$gameid}{opposite}{$self}->send($msg);
+    });
+
+    my $json = Mojo::JSON->new;
+
+    if (@{ $game{$gameid}{websockets} } == 2) {
+        $game{$gameid}{opposite}{$game{$gameid}{websockets}[0]} = $game{$gameid}{websockets}[1];
+        $game{$gameid}{opposite}{$game{$gameid}{websockets}[1]} = $game{$gameid}{websockets}[0];
+        $game{$gameid}{ws_state} = 'play';
+
+        $game{$gameid}{websockets}[0]->send($json->encode({state => 'ask'}));
+        $game{$gameid}{websockets}[1]->send($json->encode({state => 'wait-question'}));
+    } else {
+        $self->send($json->encode({state => 'wait-partner'}));
+    }
+};
+
+app->start;
+
+sub new_game {
+    my $id = sprintf("%08x", int(rand(2**32)));
+
+    $game{$id} = {
+        state => 'join',
+        ws_state => 'join',
+    };
+
+    return $id;
+}
+
+__DATA__
+
+@@ game.html.ep
+<h1>Game <%= $gameid %></h1>
+Send this link to a friend: <a href="http://mojolicious-dev:3000/join-game/<%= $gameid %>">http://mojolicious-dev:3000/join-game/<%= $gameid %></a>
+
+<p><b>State: </b><span id="state">Loading...</span></p>
+
+<input id="input" type="text">
+<button onclick="send_text()">Send</button>
+
+<script type="text/javascript">
+    var gameid = '<%= $gameid %>';
+</script>
+<script src="/game.js" type="text/javascript"></script>
+
+@@ game.js
+var ws = new WebSocket('ws://mojolicious-dev:3000/game/' + gameid);
+
+var statemap = {
+    "wait-partner": "Waiting for partner...",
+    "ask": "Ask a question.",
+    "wait-question": "Waiting for question...",
+};
+
+ws.onopen = function() {
+    console.log("Connection opened!");
+}
+
+ws.onmessage = function(msg) {
+    console.log("Received message: " + msg.data);
+
+    var d = JSON.parse(msg.data);
+
+    if (d['state']) {
+        var state = d['state'];
+        document.getElementById('state').innerHTML = statemap[state] ? statemap[state] : state;
+    }
+}
+
+function send_text() {
+    var text = document.getElementById('input').value;
+
+    ws.send(text);
+}
