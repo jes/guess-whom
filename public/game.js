@@ -3,6 +3,7 @@ var statemap = {
     "answer": "Please answer the question.",
     "loading": "Loading...",
     "connecting": "Connecting websocket...",
+    "disconnected": "Connection lost!",
     "wait-answer": "Waiting for partner to answer...",
     "wait-partner": "Waiting for a partner - send this link: <a href=\"" + gameurl + "\">" + gameurl + "</a>",
     "wait-question": "Waiting for partner to ask a question...",
@@ -53,6 +54,13 @@ ws.onmessage = function(msg) {
 
     $('#input').attr('readonly', state != 'answer' && state != 'ask');
     $('#submitter').attr('disabled', state != 'answer' && state != 'ask');
+}
+
+ws.onclose = function() {
+    set_state('disconnected');
+
+    $('#input').attr('readonly', true);
+    $('#submitter').attr('disabled', true);
 }
 
 function send_text() {
