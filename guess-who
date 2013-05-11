@@ -109,8 +109,11 @@ websocket '/ws/game/:gameid' => sub {
     });
 
     $self->on(finish => sub {
-        $game{$gameid}{opposite}{$self}->finish() if $game{$gameid}{opposite}{$self};
-        $game{$gameid}{opposite} = {};
+        if ($game{$gameid}{opposite}{$self}) {
+            $game{$gameid}{opposite}{$self}->send($json->encode({state => 'ditched'}));
+            $game{$gameid}{opposite}{$self}->finish();
+            $game{$gameid}{opposite} = {};
+        }
         delete $ws_clients{$self};
     });
 

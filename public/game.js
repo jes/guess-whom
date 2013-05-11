@@ -3,6 +3,7 @@ var statemap = {
     "answer": "Please answer the question.",
     "loading": "Loading...",
     "connecting": "Connecting websocket...",
+    "ditched": "Other player lost connection",
     "disconnected": "Connection lost!",
     "wait-answer": "Waiting for partner to answer...",
     "wait-partner": "Waiting for a partner - send this link: <a href=\"" + gameurl + "\">" + gameurl + "</a>",
@@ -40,24 +41,22 @@ ws.onmessage = function(msg) {
 
     var d = JSON.parse(msg.data);
 
-    if (d['state']) {
+    if (d['state'])
         set_state(d['state']);
-    }
 
-    if (d['answer']) {
+    if (d['answer'])
         $('#history').html($('#history').html() + '<br><b>Answer: </b>' + d['answer']);
-    }
 
-    if (d['question']) {
+    if (d['question'])
         $('#history').html($('#history').html() + '<br><b>Question: </b>' + d['question']);
-    }
 
     $('#input').attr('readonly', state != 'answer' && state != 'ask');
     $('#submitter').attr('disabled', state != 'answer' && state != 'ask');
 }
 
 ws.onclose = function() {
-    set_state('disconnected');
+    if (state != 'ditched')
+        set_state('disconnected');
 
     $('#input').attr('readonly', true);
     $('#submitter').attr('disabled', true);
