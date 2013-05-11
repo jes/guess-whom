@@ -6,6 +6,8 @@ use warnings;
 use Mojolicious::Lite;
 use Mojo::JSON;
 
+my $NHOOKERS = 10;
+
 my %game;
 
 get '/new-game' => sub {
@@ -14,6 +16,9 @@ get '/new-game' => sub {
     my $gameid = new_game();
 
     $self->stash(gameid => $gameid);
+    $self->stash(hookerid => 1 + int(rand(10)));
+
+    $game{$gameid}{first_hooker} = $self->stash('hookerid');
 
     $self->render('game');
 };
@@ -28,8 +33,11 @@ get '/join-game/:gameid' => sub {
         return;
     }
 
-    $game{$gameid}{state} = 'player0';
+    $game{$gameid}{state} = 'play';
     $self->stash(gameid => $gameid);
+    do {
+        $self->stash(hookerid => 1 + int(rand(10)));
+    } while ($self->stash('hookerid') == $game{$gameid}{first_hooker});
     $self->render('game');
 };
 
@@ -114,7 +122,10 @@ __DATA__
 
 @@ game.html.ep
 <h1>Game <%= $gameid %></h1>
-Send this link to a friend: <a href="http://mojolicious-dev:3000/join-game/<%= $gameid %>">http://mojolicious-dev:3000/join-game/<%= $gameid %></a>
+
+<p>Send this link to a friend: <a href="http://mojolicious-dev:3000/join-game/<%= $gameid %>">http://mojolicious-dev:3000/join-game/<%= $gameid %></a>.</p>
+
+<img src="/hooker/<%= $hookerid %>.jpg">
 
 <p><b>Question: </b><span id="question"></span></p>
 <p><b>Answer: </b><span id="answer"></span></p>
