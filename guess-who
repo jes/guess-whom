@@ -38,7 +38,10 @@ websocket '/game/:gameid' => sub {
 
     my $gameid = $self->param('gameid');
 
+    my $json = Mojo::JSON->new;
+
     if (!$game{$gameid} || $game{$gameid}{ws_state} ne 'join') {
+        $self->send($json->encode({error => 'game-in-progress'}));
         return;
     }
 
@@ -47,21 +50,45 @@ websocket '/game/:gameid' => sub {
     $self->on(message => sub {
         my ($self, $msg) = @_;
 
+        my $playeridx = $self == $game{$gameid}{websockets}[1];
+        my $otherself = $game{$gameid}{opposite}{$self};
+
         print STDERR "Received message: $msg\n";
 
         if ($game{$gameid}{ws_state} ne 'play') {
+            $self->send($json->encode({error => 'not-ready'}));
             return;
         }
 
-        $game{$gameid}{opposite}{$self}->send($msg);
-    });
+        if ($game{$gameid}{expect_from}[$playeridx] eq 'silence') {
+            $self->send($json->encode({error => 'silence'}));
+            return;
+        }
 
-    my $json = Mojo::JSON->new;
+        if ($game{$gameid}{expect_from}[$playeridx] eq 'question') {
+            $self->send($json->encode({state => 'wait-answer'}));
+            $otherself->send($json->encode({state => 'answer', question => $msg}));
+
+            $game{$gameid}{expect_from}[$playeridx] = 'silence';
+            $game{$gameid}{expect_from}[!$playeridx] = 'answer';
+            return;
+        }
+
+        if ($game{$gameid}{expect_from}[$playeridx] eq 'answer') {
+            $self->send($json->encode({state => 'ask'}));
+            $otherself->send($json->encode({state => 'wait-question', answer => $msg}));
+
+            $game{$gameid}{expect_from}[$playeridx] = 'question';
+            $game{$gameid}{expect_from}[!$playeridx] = 'silence';
+        }
+    });
 
     if (@{ $game{$gameid}{websockets} } == 2) {
         $game{$gameid}{opposite}{$game{$gameid}{websockets}[0]} = $game{$gameid}{websockets}[1];
         $game{$gameid}{opposite}{$game{$gameid}{websockets}[1]} = $game{$gameid}{websockets}[0];
         $game{$gameid}{ws_state} = 'play';
+        $game{$gameid}{expect_from}[0] = 'question';
+        $game{$gameid}{expect_from}[1] = 'silence';
 
         $game{$gameid}{websockets}[0]->send($json->encode({state => 'ask'}));
         $game{$gameid}{websockets}[1]->send($json->encode({state => 'wait-question'}));
@@ -89,6 +116,8 @@ __DATA__
 <h1>Game <%= $gameid %></h1>
 Send this link to a friend: <a href="http://mojolicious-dev:3000/join-game/<%= $gameid %>">http://mojolicious-dev:3000/join-game/<%= $gameid %></a>
 
+<p><b>Question: </b><span id="question"></span></p>
+<p><b>Answer: </b><span id="answer"></span></p>
 <p><b>State: </b><span id="state">Loading...</span></p>
 
 <input id="input" type="text">
@@ -103,10 +132,15 @@ Send this link to a friend: <a href="http://mojolicious-dev:3000/join-game/<%= $
 var ws = new WebSocket('ws://mojolicious-dev:3000/game/' + gameid);
 
 var statemap = {
-    "wait-partner": "Waiting for partner...",
     "ask": "Ask a question.",
+    "answer": "Answer the question.",
+    "loading": "Loading...",
+    "wait-answer": "Waiting for answer...",
+    "wait-partner": "Waiting for partner...",
     "wait-question": "Waiting for question...",
 };
+
+var state = 'loading';
 
 ws.onopen = function() {
     console.log("Connection opened!");
@@ -118,13 +152,28 @@ ws.onmessage = function(msg) {
     var d = JSON.parse(msg.data);
 
     if (d['state']) {
-        var state = d['state'];
+        state = d['state'];
         document.getElementById('state').innerHTML = statemap[state] ? statemap[state] : state;
+    }
+
+    if (d['answer']) {
+        document.getElementById('answer').innerHTML = d['answer'];
+    }
+
+    if (d['question']) {
+        document.getElementById('question').innerHTML = d['question'];
     }
 }
 
 function send_text() {
     var text = document.getElementById('input').value;
+
+    if (state == 'ask') {
+        document.getElementById('question').innerHTML = text;
+    } else if (state == 'answer') {
+        document.getElementById('answer').innerHTML = '';
+        document.getElementById('question').innerHTML = '';
+    }
 
     ws.send(text);
 }
