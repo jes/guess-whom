@@ -15,7 +15,12 @@ my %ws_clients;
 my $json = Mojo::JSON->new;
 
 my $config = plugin 'Config';
-my $host = $config->{host} or die "no host in config";
+
+foreach my $field (qw(host passphrase)) {
+    die "no $field in config" unless exists $config->{$field};
+}
+
+my $host = $config->{host};
 
 get '/new-game' => sub {
     my $self = shift;
@@ -123,6 +128,7 @@ Mojo::IOLoop->recurring(10 => sub {
     }
 });
 
+app->secret($config->{passphrase});
 app->start;
 
 sub new_game {
