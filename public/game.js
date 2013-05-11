@@ -9,16 +9,16 @@ var statemap = {
 
 var state = 'loading';
 
-var remaining_hookers = nhookers - 1;
+var remaining_faces = nfaces - 1;
 
 var html = '';
-for (var i = 1; i <= nhookers; i++) {
-    if (i == hookerid)
+for (var i = 1; i <= nfaces; i++) {
+    if (i == faceid)
         continue;
 
-    html += '<div style="float: left" id="hooker' + i + '" onclick="toggle_hooker(' + i + ')">' + hookernames[i] + '<br><img src="/hooker/' + i + '.jpg"></div>';
+    html += '<div style="float: left" id="face' + i + '" onclick="toggle_face(' + i + ')">' + facenames[i] + '<br><img src="/face/' + i + '.jpg"></div>';
 }
-$('#hookers').html(html);
+$('#faces').html(html);
 
 $('#q-and-a').submit(function() {
     send_text();
@@ -63,14 +63,14 @@ function send_text() {
     ws.send(text);
 }
 
-function toggle_hooker(i) {
-    var opacity = $('#hooker' + i).css('opacity');
+function toggle_face(i) {
+    var opacity = $('#face' + i).css('opacity');
 
     if (opacity < 1) {
-        remaining_hookers++;
-        $('#hooker' + i).css('opacity', '1.0');
+        remaining_faces++;
+        $('#face' + i).css('opacity', '1.0');
     } else {
-        remaining_hookers--;
-        $('#hooker' + i).css('opacity', '0.4');
+        remaining_faces--;
+        $('#face' + i).css('opacity', '0.4');
     }
 }

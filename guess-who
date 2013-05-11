@@ -20,13 +20,13 @@ get '/new-game' => sub {
     my $gameid = new_game();
 
     $self->stash(gameid => $gameid);
-    $self->stash(hookerid => 1 + int(rand($NHOOKERS)));
-    $self->stash(hookername => $HOOKERNAME[$self->stash('hookerid')]);
+    $self->stash(faceid => 1 + int(rand($NHOOKERS)));
+    $self->stash(facename => $HOOKERNAME[$self->stash('faceid')]);
     $self->stash(firstuser => 1);
 
-    $game{$gameid}{first_hooker} = $self->stash('hookerid');
+    $game{$gameid}{first_face} = $self->stash('faceid');
 
-    $self->render('game', nhookers => $NHOOKERS, hookernames => $json->encode(\@HOOKERNAME));
+    $self->render('game', nfaces => $NHOOKERS, facenames => $json->encode(\@HOOKERNAME));
 };
 
 get '/join-game/:gameid' => sub {
@@ -42,10 +42,10 @@ get '/join-game/:gameid' => sub {
     $game{$gameid}{state} = 'play';
     $self->stash(gameid => $gameid);
     do {
-        $self->stash(hookerid => 1 + int(rand($NHOOKERS)));
-    } while ($self->stash('hookerid') == $game{$gameid}{first_hooker});
-    $self->stash(hookername => $HOOKERNAME[$self->stash('hookerid')]);
-    $self->render('game', nhookers => $NHOOKERS, hookernames => $json->encode(\@HOOKERNAME));
+        $self->stash(faceid => 1 + int(rand($NHOOKERS)));
+    } while ($self->stash('faceid') == $game{$gameid}{first_face});
+    $self->stash(facename => $HOOKERNAME[$self->stash('faceid')]);
+    $self->render('game', nfaces => $NHOOKERS, facenames => $json->encode(\@HOOKERNAME));
 };
 
 websocket '/game/:gameid' => sub {
