@@ -9,6 +9,9 @@ use Mojo::JSON;
 my $NHOOKERS = 10;
 
 my %game;
+my %ws_clients;
+
+my $json = Mojo::JSON->new;
 
 get '/new-game' => sub {
     my $self = shift;
@@ -46,12 +49,12 @@ websocket '/game/:gameid' => sub {
 
     my $gameid = $self->param('gameid');
 
-    my $json = Mojo::JSON->new;
-
     if (!$game{$gameid} || $game{$gameid}{ws_state} ne 'join') {
         $self->send($json->encode({error => 'game-in-progress'}));
         return;
     }
+
+    $ws_clients{$self} = $self;
 
     push @{ $game{$gameid}{websockets} }, $self;
 
@@ -104,6 +107,12 @@ websocket '/game/:gameid' => sub {
         $self->send($json->encode({state => 'wait-partner'}));
     }
 };
+
+Mojo::IOLoop->recurring(10 => sub {
+    for my $client (values %ws_clients) {
+        $client->send($json->encode({ping => 'foo'}));
+    }
+});
 
 app->start;
 
