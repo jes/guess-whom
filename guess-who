@@ -138,8 +138,8 @@ __DATA__
 
 <%= $hookername %><br><img src="/hooker/<%= $hookerid %>.jpg">
 
-<p><b>Question: </b><span id="question"></span></p>
-<p><b>Answer: </b><span id="answer"></span></p>
+<div id="history"></div>
+
 <p><b>State: </b><span id="state">Loading...</span></p>
 
 <input id="input" type="text">
@@ -193,16 +193,15 @@ ws.onmessage = function(msg) {
 
     if (d['state']) {
         state = d['state'];
-        document.getElementById('state').innerHTML = statemap[state] ? statemap[state] : state;
+        $('#state').html(statemap[state] ? statemap[state] : state);
     }
 
     if (d['answer']) {
-        document.getElementById('answer').innerHTML = d['answer'];
+        $('#history').html($('#history').html() + '<br><b>Answer: </b>' + d['answer']);
     }
 
     if (d['question']) {
-        document.getElementById('question').innerHTML = d['question'];
-        document.getElementById('answer').innerHTML = '';
+        $('#history').html($('#history').html() + '<br><b>Question: </b>' + d['question']);
     }
 }
 
@@ -211,10 +210,9 @@ function send_text() {
     $('#input').val('');
 
     if (state == 'ask') {
-        $('#question').html(text);
+        $('#history').html($('#history').html() + '<br><b>Question: </b>' + text);
     } else if (state == 'answer') {
-        $('#answer').html('');
-        $('#question').html('');
+        $('#history').html($('#history').html() + '<br><b>Answer: </b>' + text);
     }
 
     ws.send(text);
