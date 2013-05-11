@@ -14,13 +14,16 @@ my %ws_clients;
 
 my $json = Mojo::JSON->new;
 
+my $config = plugin 'Config';
+my $host = $config->{host} or die "no host in config";
+
 get '/new-game' => sub {
     my $self = shift;
 
     my $gameid = new_game();
 
     $self->stash(gameid => $gameid);
-    $self->stash(gameurl => "http://mojolicious-dev:3000/game/$gameid");
+    $self->stash(gameurl => "http://$host/game/$gameid");
     $self->stash(faceid => 1 + int(rand($NHOOKERS)));
     $self->stash(facename => $HOOKERNAME[$self->stash('faceid')]);
     $self->stash(firstuser => 1);
@@ -42,7 +45,7 @@ get '/game/:gameid' => sub {
 
     $game{$gameid}{state} = 'play';
     $self->stash(gameid => $gameid);
-    $self->stash(gameurl => "http://mojolicious-dev:3000/game/$gameid");
+    $self->stash(gameurl => "http://$host/game/$gameid");
     do {
         $self->stash(faceid => 1 + int(rand($NHOOKERS)));
     } while ($self->stash('faceid') == $game{$gameid}{first_face});
