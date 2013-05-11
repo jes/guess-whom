@@ -23,6 +23,7 @@
 
 <script type="text/javascript">
     var gameid = '<%= $gameid %>';
+    var gameurl = '<%= $gameurl %>';
     var faceid = '<%= $faceid %>';
     var nfaces = <%= $nfaces %>;
     var facenames = <%== $facenames %>;

@@ -20,6 +20,7 @@ get '/new-game' => sub {
     my $gameid = new_game();
 
     $self->stash(gameid => $gameid);
+    $self->stash(gameurl => "http://mojolicious-dev:3000/game/$gameid");
     $self->stash(faceid => 1 + int(rand($NHOOKERS)));
     $self->stash(facename => $HOOKERNAME[$self->stash('faceid')]);
     $self->stash(firstuser => 1);
@@ -29,7 +30,7 @@ get '/new-game' => sub {
     $self->render('game', nfaces => $NHOOKERS, facenames => $json->encode(\@HOOKERNAME));
 };
 
-get '/join-game/:gameid' => sub {
+get '/game/:gameid' => sub {
     my $self = shift;
 
     my $gameid = $self->param('gameid');
@@ -41,6 +42,7 @@ get '/join-game/:gameid' => sub {
 
     $game{$gameid}{state} = 'play';
     $self->stash(gameid => $gameid);
+    $self->stash(gameurl => "http://mojolicious-dev:3000/game/$gameid");
     do {
         $self->stash(faceid => 1 + int(rand($NHOOKERS)));
     } while ($self->stash('faceid') == $game{$gameid}{first_face});
@@ -48,7 +50,7 @@ get '/join-game/:gameid' => sub {
     $self->render('game', nfaces => $NHOOKERS, facenames => $json->encode(\@HOOKERNAME));
 };
 
-websocket '/game/:gameid' => sub {
+websocket '/ws/game/:gameid' => sub {
     my $self = shift;
 
     my $gameid = $self->param('gameid');

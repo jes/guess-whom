@@ -2,12 +2,13 @@ var statemap = {
     "ask": "Please ask a question.",
     "answer": "Please answer the question.",
     "loading": "Loading...",
+    "connecting": "Connecting websocket...",
     "wait-answer": "Waiting for partner to answer...",
-    "wait-partner": "Waiting for a partner - send this link: <a href=\"http://mojolicious-dev:3000/join-game/" + gameid + "\">http://mojolicious-dev:3000/join-game/" + gameid + "</a>",
+    "wait-partner": "Waiting for a partner - send this link: <a href=\"" + gameurl + "\">" + gameurl + "</a>",
     "wait-question": "Waiting for partner to ask a question...",
 };
 
-var state = 'loading';
+var state = 'loading';;
 
 var remaining_faces = nfaces - 1;
 
@@ -25,7 +26,9 @@ $('#q-and-a').submit(function() {
     return false;
 });
 
-var ws = new WebSocket('ws://mojolicious-dev:3000/game/' + gameid);
+set_state('connecting');
+
+var ws = new WebSocket('ws://mojolicious-dev:3000/ws/game/' + gameid);
 
 ws.onopen = function() {
     console.log("Connection opened!");
@@ -37,8 +40,7 @@ ws.onmessage = function(msg) {
     var d = JSON.parse(msg.data);
 
     if (d['state']) {
-        state = d['state'];
-        $('#state').html(statemap[state] ? statemap[state] : state);
+        set_state(d['state']);
     }
 
     if (d['answer']) {
@@ -73,4 +75,9 @@ function toggle_face(i) {
         remaining_faces--;
         $('#face' + i).css('opacity', '0.3');
     }
+}
+
+function set_state(s) {
+    $('#state').html(statemap[s] ? statemap[s] : s);
+    state = s;
 }
