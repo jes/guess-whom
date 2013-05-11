@@ -151,7 +151,7 @@ __DATA__
 <script type="text/javascript">
     var gameid = '<%= $gameid %>';
     var hookerid = '<%= $hookerid %>';
-    var nhookers = '<%= $nhookers %>';
+    var nhookers = <%= $nhookers %>;
     var hookernames = <%== $hookernames %>;
 </script>
 <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.min.js"></script>
@@ -168,6 +168,8 @@ var statemap = {
 };
 
 var state = 'loading';
+
+var remaining_hookers = nhookers;
 
 var html = '';
 for (var i = 1; i <= nhookers; i++) {
@@ -220,5 +222,12 @@ function send_text() {
 
 function toggle_hooker(i) {
     var opacity = $('#hooker' + i).css('opacity');
-    $('#hooker' + i).css('opacity', opacity < 1 ? '1.0' : '0.4');
+
+    if (opacity < 1) {
+        remaining_hookers++;
+        $('#hooker' + i).css('opacity', '1.0');
+    } else {
+        remaining_hookers--;
+        $('#hooker' + i).css('opacity', '0.4');
+    }
 }
