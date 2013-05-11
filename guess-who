@@ -22,6 +22,8 @@ foreach my $field (qw(host passphrase)) {
 
 my $host = $config->{host};
 
+get '/' => sub { shift->render('index'); };
+
 get '/new-game' => sub {
     my $self = shift;
 

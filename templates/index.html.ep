@@ -1,0 +1,6 @@
+% title 'Guess Whom!';
+% layout 'default';
+
+<p>This is Guess Whom!</p>
+
+<p>You probably want to start a <a href="/new-game">new game</a>.</p>
