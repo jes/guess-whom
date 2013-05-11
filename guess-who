@@ -76,7 +76,7 @@ websocket '/game/:gameid' => sub {
         }
 
         if ($game{$gameid}{expect_from}[$playeridx] eq 'silence') {
-            $self->send($json->encode({error => 'silence'}));
+            $self->send($json->encode({error => 'shutup'}));
             return;
         }
 

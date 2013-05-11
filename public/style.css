@@ -1,0 +1,26 @@
+html, body {
+    width: 900px;
+    margin: auto;
+    font-family: sans-serif;
+    color: #800;
+}
+
+.face {
+    font-family: monospace;
+    text-align: center;
+    float: left;
+    width: 150px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+
+.faces {
+    background-color: #def;
+    float: left;
+}
+
+.input {
+    float: left;
+    width: 900px;
+    padding: 20px;
+}

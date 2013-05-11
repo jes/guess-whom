@@ -16,7 +16,7 @@ for (var i = 1; i <= nfaces; i++) {
     if (i == faceid)
         continue;
 
-    html += '<div style="float: left" id="face' + i + '" onclick="toggle_face(' + i + ')">' + facenames[i] + '<br><img src="/face/' + i + '.jpg"></div>';
+    html += '<div class="face" id="face' + i + '" onclick="toggle_face(' + i + ')">' + facenames[i] + '<br><img src="/face/' + i + '.jpg"></div>';
 }
 $('#faces').html(html);
 
@@ -71,6 +71,6 @@ function toggle_face(i) {
         $('#face' + i).css('opacity', '1.0');
     } else {
         remaining_faces--;
-        $('#face' + i).css('opacity', '0.4');
+        $('#face' + i).css('opacity', '0.3');
     }
 }
