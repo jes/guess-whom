@@ -143,14 +143,16 @@ __DATA__
 <input id="input" type="text">
 <button onclick="send_text()">Send</button>
 
+<div id="hookers">
+</div>
+
 <script type="text/javascript">
     var gameid = '<%= $gameid %>';
+    var hookerid = '<%= $hookerid %>';
 </script>
 <script src="/game.js" type="text/javascript"></script>
 
 @@ game.js
-var ws = new WebSocket('ws://mojolicious-dev:3000/game/' + gameid);
-
 var statemap = {
     "ask": "Ask a question.",
     "answer": "Answer the question.",
@@ -161,6 +163,17 @@ var statemap = {
 };
 
 var state = 'loading';
+
+var html = '';
+for (var i = 1; i <= 10; i++) {
+    if (i == hookerid)
+        continue;
+
+    html += '<img src="/hooker/' + i + '.jpg">';
+}
+document.getElementById('hookers').innerHTML = html;
+
+var ws = new WebSocket('ws://mojolicious-dev:3000/game/' + gameid);
 
 ws.onopen = function() {
     console.log("Connection opened!");
