@@ -70,6 +70,8 @@ websocket '/ws/game/:gameid' => sub {
 
     push @{ $game{$gameid}{websockets} }, $self;
 
+    $game{$gameid}{n_connected}++;
+
     $self->on(message => sub {
         my ($self, $msg) = @_;
 
@@ -112,6 +114,9 @@ websocket '/ws/game/:gameid' => sub {
             $game{$gameid}{opposite}{$self}->finish();
             $game{$gameid}{opposite} = {};
         }
+
+        destroy_game($gameid) unless --$game{$gameid}{n_connected};
+
         delete $ws_clients{$self};
     });
 
@@ -157,4 +162,10 @@ sub render_game {
     $self->stash(facename => $HOOKERNAME[$self->stash('faceid')]);
 
     $self->render('game', nfaces => $NHOOKERS, facenames => $json->encode(\@HOOKERNAME));
+}
+
+sub destroy_game {
+    my $gameid = shift;
+
+    $game{$gameid} = {};
 }
