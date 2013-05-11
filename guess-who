@@ -171,7 +171,7 @@ var statemap = {
 
 var state = 'loading';
 
-var remaining_hookers = nhookers;
+var remaining_hookers = nhookers - 1;
 
 var html = '';
 for (var i = 1; i <= nhookers; i++) {
