@@ -14,7 +14,7 @@
 
     <form id="q-and-a">
         <input id="input" type="text">
-        <button type="submit">Send</button>
+        <button id="submitter" type="submit">Send</button>
     </form>
 </div>
 

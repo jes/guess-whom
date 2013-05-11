@@ -75,7 +75,7 @@ websocket '/ws/game/:gameid' => sub {
     $self->on(message => sub {
         my ($self, $msg) = @_;
 
-        my $playeridx = $self == $game{$gameid}{websockets}[1];
+        my $playeridx = $game{$gameid}{websockets}[1] && $self == $game{$gameid}{websockets}[1];
         my $otherself = $game{$gameid}{opposite}{$self};
 
         print STDERR "Received message: $msg\n";

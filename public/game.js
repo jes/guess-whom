@@ -50,6 +50,9 @@ ws.onmessage = function(msg) {
     if (d['question']) {
         $('#history').html($('#history').html() + '<br><b>Question: </b>' + d['question']);
     }
+
+    $('#input').attr('readonly', state != 'answer' && state != 'ask');
+    $('#submitter').attr('disabled', state != 'answer' && state != 'ask');
 }
 
 function send_text() {
