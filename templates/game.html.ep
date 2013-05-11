@@ -1,5 +1,5 @@
-<h1>Game <%= $gameid %></h1>
-
+% title "Game $gameid";
+% layout 'default';
 <%= $hookername %><br><img src="/hooker/<%= $hookerid %>.jpg">
 
 <div id="history"></div>
