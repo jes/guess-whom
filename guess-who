@@ -205,13 +205,14 @@ ws.onmessage = function(msg) {
 }
 
 function send_text() {
-    var text = document.getElementById('input').value;
+    var text = $('#input').val();
+    $('#input').val('');
 
     if (state == 'ask') {
-        document.getElementById('question').innerHTML = text;
+        $('#question').html(text);
     } else if (state == 'answer') {
-        document.getElementById('answer').innerHTML = '';
-        document.getElementById('question').innerHTML = '';
+        $('#answer').html('');
+        $('#question').html('');
     }
 
     ws.send(text);
