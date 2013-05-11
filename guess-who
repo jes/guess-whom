@@ -20,6 +20,7 @@ get '/new-game' => sub {
 
     $self->stash(gameid => $gameid);
     $self->stash(hookerid => 1 + int(rand(10)));
+    $self->stash(firstuser => 1);
 
     $game{$gameid}{first_hooker} = $self->stash('hookerid');
 
@@ -132,8 +133,6 @@ __DATA__
 @@ game.html.ep
 <h1>Game <%= $gameid %></h1>
 
-<p>Send this link to a friend: <a href="http://mojolicious-dev:3000/join-game/<%= $gameid %>">http://mojolicious-dev:3000/join-game/<%= $gameid %></a>.</p>
-
 <img src="/hooker/<%= $hookerid %>.jpg">
 
 <p><b>Question: </b><span id="question"></span></p>
@@ -158,7 +157,7 @@ var statemap = {
     "answer": "Answer the question.",
     "loading": "Loading...",
     "wait-answer": "Waiting for answer...",
-    "wait-partner": "Waiting for partner...",
+    "wait-partner": "Waiting for partner; Send this link: <a href=\"http://mojolicious-dev:3000/join-game/" + gameid + "\">http://mojolicious-dev:3000/join-game/" + gameid + "</a>",
     "wait-question": "Waiting for question...",
 };
 
