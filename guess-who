@@ -142,8 +142,10 @@ __DATA__
 
 <p><b>State: </b><span id="state">Loading...</span></p>
 
-<input id="input" type="text">
-<button onclick="send_text()">Send</button>
+<form id="q-and-a">
+    <input id="input" type="text">
+    <button type="submit">Send</button>
+</form>
 
 <div id="hookers">
 </div>
@@ -179,6 +181,11 @@ for (var i = 1; i <= nhookers; i++) {
     html += '<div style="float: left" id="hooker' + i + '" onclick="toggle_hooker(' + i + ')">' + hookernames[i] + '<br><img src="/hooker/' + i + '.jpg"></div>';
 }
 $('#hookers').html(html);
+
+$('#q-and-a').submit(function() {
+    send_text();
+    return false;
+});
 
 var ws = new WebSocket('ws://mojolicious-dev:3000/game/' + gameid);
 
