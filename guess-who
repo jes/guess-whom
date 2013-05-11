@@ -153,12 +153,12 @@ __DATA__
 
 @@ game.js
 var statemap = {
-    "ask": "Ask a question.",
-    "answer": "Answer the question.",
+    "ask": "Please ask a question.",
+    "answer": "Please answer the question.",
     "loading": "Loading...",
-    "wait-answer": "Waiting for answer...",
-    "wait-partner": "Waiting for partner; Send this link: <a href=\"http://mojolicious-dev:3000/join-game/" + gameid + "\">http://mojolicious-dev:3000/join-game/" + gameid + "</a>",
-    "wait-question": "Waiting for question...",
+    "wait-answer": "Waiting for partner to answer...",
+    "wait-partner": "Waiting for a partner - send this link: <a href=\"http://mojolicious-dev:3000/join-game/" + gameid + "\">http://mojolicious-dev:3000/join-game/" + gameid + "</a>",
+    "wait-question": "Waiting for partner to ask a question...",
 };
 
 var state = 'loading';
