@@ -194,6 +194,7 @@ ws.onmessage = function(msg) {
 
     if (d['question']) {
         document.getElementById('question').innerHTML = d['question'];
+        document.getElementById('answer').innerHTML = '';
     }
 }
 
