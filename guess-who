@@ -108,6 +108,12 @@ websocket '/ws/game/:gameid' => sub {
         }
     });
 
+    $self->on(finish => sub {
+        $game{$gameid}{opposite}{$self}->finish() if $game{$gameid}{opposite}{$self};
+        $game{$gameid}{opposite} = {};
+        delete $ws_clients{$self};
+    });
+
     if (@{ $game{$gameid}{websockets} } == 2) {
         $game{$gameid}{opposite}{$game{$gameid}{websockets}[0]} = $game{$gameid}{websockets}[1];
         $game{$gameid}{opposite}{$game{$gameid}{websockets}[1]} = $game{$gameid}{websockets}[0];
