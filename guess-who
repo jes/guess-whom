@@ -3,6 +3,7 @@
 use strict;
 use warnings;
 
+use DB_File;
 use Mojolicious::Lite;
 use Mojo::JSON;
 
@@ -16,16 +17,39 @@ my $json = Mojo::JSON->new;
 
 my $config = plugin 'Config';
 
-foreach my $field (qw(host passphrase)) {
+foreach my $field (qw(host passphrase db)) {
     die "no $field in config" unless exists $config->{$field};
 }
 
 my $host = $config->{host};
 
+my $db = tie my %dbhash, DB_File => $config->{db};
+
+$dbhash{rehashes}++;
+
 get '/' => sub { shift->render('index'); };
+
+get '/stats' => sub { shift->render_text(text => $json->encode(\%dbhash)); };
+
+get '/livestats' => sub {
+    my $self = shift;
+
+    my @clients = keys %ws_clients;
+    my $nclients = @clients;
+
+    my @games = keys %game;
+    my $ngames = @games;
+
+    $self->render_text(text => $json->encode({
+        ws_clients => $nclients,
+        livegames => $ngames,
+    }));
+};
 
 get '/new-game' => sub {
     my $self = shift;
+
+    $dbhash{newgames}++;
 
     my $gameid = new_game();
 
@@ -45,8 +69,11 @@ get '/game/:gameid' => sub {
 
     if (!$game{$gameid} || $game{$gameid}{state} ne 'join') {
         $self->render(text => 'Nope.');
+        $dbhash{failed_joins}++;
         return;
     }
+
+    $dbhash{http_gamestarts}++;
 
     $self->stash(gameid => $gameid);
 
@@ -64,6 +91,8 @@ websocket '/ws/game/:gameid' => sub {
     my $self = shift;
 
     my $gameid = $self->param('gameid');
+
+    $dbhash{ws_connects}++;
 
     if (!($game{$gameid} && $game{$gameid}{ws_state} eq 'join')) {
         $self->send($json->encode({error => 'game-in-progress'}));
@@ -122,6 +151,9 @@ websocket '/ws/game/:gameid' => sub {
                     $self->send($json->encode({state => 'defeat', face => $game{$gameid}{faces}[!$playeridx]}));
                 }
 
+                $game{$gameid}{finished} = 1;
+                $dbhash{finished_games}++;
+
                 $self->finish();
                 $otherself->finish();
             }
@@ -140,6 +172,10 @@ websocket '/ws/game/:gameid' => sub {
     });
 
     $self->on(finish => sub {
+        if (!$game{$gameid}{finished}) {
+            $dbhash{game_aborts}++;
+        }
+
         if ($game{$gameid}{opposite}{$self}) {
             $game{$gameid}{opposite}{$self}->send($json->encode({state => 'ditched'}));
             $game{$gameid}{opposite}{$self}->finish();
@@ -152,6 +188,8 @@ websocket '/ws/game/:gameid' => sub {
     });
 
     if (@{ $game{$gameid}{websockets} } == 2) {
+        $dbhash{ws_gamestarts}++;
+
         $game{$gameid}{opposite}{$game{$gameid}{websockets}[0]} = $game{$gameid}{websockets}[1];
         $game{$gameid}{opposite}{$game{$gameid}{websockets}[1]} = $game{$gameid}{websockets}[0];
         $game{$gameid}{ws_state} = 'play';
@@ -198,5 +236,5 @@ sub render_game {
 sub destroy_game {
     my $gameid = shift;
 
-    $game{$gameid} = {};
+    delete $game{$gameid};
 }
