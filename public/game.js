@@ -98,6 +98,8 @@ ws.onclose = function() {
     $('#input').attr('readonly', true);
     $('#victory').attr('disabled', true);
     $('#submitter').attr('disabled', true);
+
+    redraw_inputs();
 }
 
 function send_victory() {
