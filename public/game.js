@@ -70,7 +70,7 @@ ws.onmessage = function(msg) {
                 $('#history').html($('#history').html() + '<br>Opponent guessed <b>' + facenames[d['face']] + '</b>.');
             }
             if (d['realface'] != undefined) {
-                $('#history').html($('#history').html() + '<br><b>You won!</b> Your opponent\'s face was <b>' + facenames[d['realface']] + '</b>.');
+                $('#history').html($('#history').html() + '<br><b>You won!</b> Your opponent\'s ' + singular + ' was <b>' + facenames[d['realface']] + '</b>.');
             } else {
                 $('#history').html($('#history').html() + '<br><b>You won!</b>');
             }
@@ -78,7 +78,7 @@ ws.onmessage = function(msg) {
             if (oldstate == 'wait-question') {
                 $('#history').html($('#history').html() + '<br>Opponent guessed corectly.');
             }
-            $('#history').html($('#history').html() + '<br><b>You lost!</b> Your opponent\'s face was ' + facenames[d['face']] + '.');
+            $('#history').html($('#history').html() + '<br><b>You lost!</b> Your opponent\'s ' + singular + ' was ' + facenames[d['face']] + '.');
         }
     }
 

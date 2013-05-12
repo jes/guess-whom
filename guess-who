@@ -7,9 +7,6 @@ use DBM::Deep;
 use Mojolicious::Lite;
 use Mojo::JSON;
 
-my $NHOOKERS = 10;
-my @HOOKERNAME = qw(none Katja Stella Janine Jessica Mira Emma Adriana Carla Luisa Luna);
-
 my %game;
 my %ws_clients;
 
@@ -249,7 +246,12 @@ sub render_game {
     $self->stash(facetype => $facetype);
 
     my @facenames = @{ $db->{facetype}{$facetype}{facenames} };
-    $self->render('game', nfaces => $NHOOKERS, facenames => $json->encode(\@facenames));
+    $self->render('game',
+        nfaces => $db->{facetype}{$facetype}{nfaces},
+        facenames => $json->encode(\@facenames),
+        singular => $db->{facetype}{$facetype}{singular},
+        plural => $db->{facetype}{$facetype}{plural},
+    );
 }
 
 sub destroy_game {
