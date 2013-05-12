@@ -57,6 +57,7 @@ get '/new-game' => sub {
     $self->stash(faceid => 1 + int(rand($NHOOKERS)));
     $self->stash(firstuser => 1);
 
+    $game{$gameid}{facetype} = 'cologne-hookers';
     $game{$gameid}{faces} = [ $self->stash('faceid') ];
 
     render_game($self);
@@ -229,6 +230,7 @@ sub render_game {
 
     $self->stash(gameurl => "http://$host/game/" . $self->stash('gameid'));
     $self->stash(facename => $HOOKERNAME[$self->stash('faceid')]);
+    $self->stash(facetype => $game{$self->stash('gameid')}{facetype});
 
     $self->render('game', nfaces => $NHOOKERS, facenames => $json->encode(\@HOOKERNAME));
 }

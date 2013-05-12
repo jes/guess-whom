@@ -23,7 +23,7 @@ for (var i = 1; i <= nfaces; i++) {
     if (i == faceid)
         continue;
 
-    html += '<div class="face" id="face' + i + '" onclick="toggle_face(' + i + ')">' + facenames[i] + '<br><img src="/face/' + i + '.jpg"></div>';
+    html += '<div class="face" id="face' + i + '" onclick="toggle_face(' + i + ')">' + facenames[i] + '<br><img src="/face/' + facetype + '/' + i + '.jpg"></div>';
 }
 $('#faces').html(html);
 
