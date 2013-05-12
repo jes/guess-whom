@@ -32,19 +32,16 @@ $('#question-form').submit(function() {
     return false;
 });
 
-$('#victory-form').submit(function() {
+$('#victory').click(function() {
     send_victory();
-    return false;
 });
 
-$('#yes-form').submit(function() {
+$('#yes-button').click(function() {
     send_answer('yes');
-    return false;
 });
 
-$('#no-form').submit(function() {
+$('#no-button').click(function() {
     send_answer('no');
-    return false;
 });
 
 set_state('connecting');

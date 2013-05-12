@@ -19,17 +19,11 @@
         </form>
     </div>
     <div style="display:none" id="victory-input">
-        <form id="victory-form">
-            <button id="victory" type="submit">It's facename!</button> (or re-enable some more faces to ask more questions)
-        </form>
+        <button id="victory">It's facename!</button> (or re-enable some more faces to ask more questions)
     </div>
     <div style="display:none" id="answer-input">
-        <form id="yes-form">
-            <button id="yes-button" type="submit">Yes</button>
-        </form>
-        <form id="no-form">
-            <button id="no-button" type="submit">No</button>
-        </form>
+        <button id="yes-button">Yes</button>
+        <button id="no-button">No</button>
     </div>
     </form>
 </div>
