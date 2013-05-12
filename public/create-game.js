@@ -13,8 +13,24 @@ $('#file-input').change(function() {
     var image = new Image();
 
     image.onload = function() {
-        ctx.drawImage(image, 0, 0, 900, 675);
+        var dim = scale(image, 900, 675);
+        ctx.fillStyle = '#fff';
+        ctx.fill();
+        ctx.drawImage(image, 0, 0, dim.w, dim.h);
     };
 
     image.src = url;
 });
+
+function scale(img, w, h) {
+    var wfactor = img.width / w;
+    var hfactor = img.height / h;
+
+    if (wfactor > hfactor) {
+        console.log("wf");
+        return { w: w, h: img.height / wfactor };
+    } else {
+        console.log("hfactor = " + hfactor);
+        return { w: img.width / hfactor, h: h };
+    }
+};
