@@ -53,7 +53,7 @@ get '/game/:gameid' => sub {
     $game{$gameid}{state} = 'play';
     do {
         $self->stash(faceid => 1 + int(rand($NHOOKERS)));
-    } while ($self->stash('faceid') == $game{$gameid}{first_face});
+    } while ($self->stash('faceid') == $game{$gameid}{faces}[0]);
 
     push @{ $game{$gameid}{faces} }, $self->stash('faceid');
 
@@ -96,7 +96,7 @@ websocket '/ws/game/:gameid' => sub {
             return;
         }
 
-        if ($msg->{type} eq 'question-or-answer') {
+        if ($msg->{type} eq 'question') {
             if ($game{$gameid}{expect_from}[$playeridx] eq 'question') {
                 $self->send($json->encode({state => 'wait-answer'}));
                 $otherself->send($json->encode({state => 'answer', question => $msg->{text}}));
@@ -113,22 +113,29 @@ websocket '/ws/game/:gameid' => sub {
                 $game{$gameid}{expect_from}[!$playeridx] = 'silence';
             }
         } elsif ($msg->{type} eq 'victory') {
-            my ($loser, $victor, $victorface);
-            if ($game{$gameid}{faces}[!$playeridx] == $msg->{face}) {
-                $victor = $self;
-                $loser = $otherself;
-                $victorface = $game{$gameid}{faces}[$playeridx];
-            } else {
-                $victor = $otherself;
-                $loser = $self;
-                $victorface = $game{$gameid}{faces}[!$playeridx];
-            }
+            if ($game{$gameid}{expect_from}[$playeridx] eq 'question') {
+                if ($game{$gameid}{faces}[!$playeridx] == $msg->{face}) {
+                    $self->send($json->encode({state => 'victory'}));
+                    $otherself->send($json->encode({state => 'defeat', face => $game{$gameid}{faces}[$playeridx]}));
+                } else {
+                    $otherself->send($json->encode({state => 'victory', face => $msg->{face}, realface => $game{$gameid}{faces}[$playeridx]}));
+                    $self->send($json->encode({state => 'defeat', face => $game{$gameid}{faces}[!$playeridx]}));
+                }
 
-            # TODO: Reveal the opponent's screen?
-            $victor->send($json->encode({state => 'victory'}));
-            $loser->send($json->encode({state => 'defeat', face => $victorface}));
-            $victor->finish();
-            $loser->finish();
+                $self->finish();
+                $otherself->finish();
+            }
+        } elsif ($msg->{type} eq 'answer') {
+            if ($game{$gameid}{expect_from}[$playeridx] eq 'answer') {
+                # don't allow arbitrary answers
+                my $answer = $msg->{answer} eq 'yes' ? 'yes' : 'no';
+
+                $self->send($json->encode({state => 'ask'}));
+                $otherself->send($json->encode({state => 'wait-question', answer => $answer}));
+
+                $game{$gameid}{expect_from}[$playeridx] = 'question';
+                $game{$gameid}{expect_from}[!$playeridx] = 'silence';
+            }
         }
     });
 

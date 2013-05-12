@@ -12,14 +12,25 @@
 <div class="input">
     <p><b>State: </b><span id="state">Loading...</span></p>
 
-    <form id="q-and-a">
-        <div id="question-input">
+    <div id="question-input">
+        <form id="question-form">
             <input id="input" type="text">
             <button id="submitter" type="submit">Send</button>
-        </div>
-        <div style="display:none" id="victory-input">
+        </form>
+    </div>
+    <div style="display:none" id="victory-input">
+        <form id="victory-form">
             <button id="victory" type="submit">It's facename!</button> (or re-enable some more faces to ask more questions)
-        </div>
+        </form>
+    </div>
+    <div style="display:none" id="answer-input">
+        <form id="yes-form">
+            <button id="yes-button" type="submit">Yes</button>
+        </form>
+        <form id="no-form">
+            <button id="no-button" type="submit">No</button>
+        </form>
+    </div>
     </form>
 </div>
 

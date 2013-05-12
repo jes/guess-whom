@@ -1,13 +1,13 @@
 var statemap = {
     "ask": "Please ask a question.",
     "answer": "Please answer the question.",
-    "defeat": "You lost.",
+    "defeat": "Loser.",
     "loading": "Loading...",
     "connected": "Connection established.",
     "connecting": "Connecting websocket...",
     "ditched": "Other player lost connection",
     "disconnected": "Connection lost.",
-    "victory": "You won!",
+    "victory": "Winner.",
     "wait-answer": "Waiting for partner to answer...",
     "wait-partner": "Waiting for a partner - send this link: <a href=\"" + gameurl + "\">" + gameurl + "</a>",
     "wait-question": "Waiting for partner to ask a question...",
@@ -27,8 +27,23 @@ for (var i = 1; i <= nfaces; i++) {
 }
 $('#faces').html(html);
 
-$('#q-and-a').submit(function() {
+$('#question-form').submit(function() {
     send_question();
+    return false;
+});
+
+$('#victory-form').submit(function() {
+    send_victory();
+    return false;
+});
+
+$('#yes-form').submit(function() {
+    send_answer('yes');
+    return false;
+});
+
+$('#no-form').submit(function() {
+    send_answer('no');
     return false;
 });
 
@@ -45,24 +60,35 @@ ws.onmessage = function(msg) {
 
     var d = JSON.parse(msg.data);
 
-    if (d['state'])
+    var oldstate = state;
+
+    if (d['state'] != undefined) {
         set_state(d['state']);
 
-    if (d['answer'])
-        $('#history').html($('#history').html() + '<br><b>Answer: </b>' + d['answer']);
-
-    if (d['question'])
-        $('#history').html($('#history').html() + '<br><b>Question: </b>' + d['question']);
-
-    if (d['state'] && d['state'] == 'victory') {
-        $('#history').html($('#history').html() + '<br><b>Winner!</b>');
-    } else if(d['state'] && d['state'] == 'defeat') {
-        $('#history').html($('#history').html() + '<br><b>Loser!</b> The correct answer was ' + facenames[d['face']] + '.');
+        if (d['state'] == 'victory') {
+            if (d['face'] != undefined) {
+                $('#history').html($('#history').html() + '<br>Opponent guessed <b>' + facenames[d['face']] + '</b>.');
+            }
+            if (d['realface'] != undefined) {
+                $('#history').html($('#history').html() + '<br><b>You won!</b> Your opponent\'s face was <b>' + facenames[d['realface']] + '</b>.');
+            } else {
+                $('#history').html($('#history').html() + '<br><b>You won!</b>');
+            }
+        } else if(d['state'] == 'defeat') {
+            if (oldstate == 'wait-question') {
+                $('#history').html($('#history').html() + '<br>Opponent guessed corectly.');
+            }
+            $('#history').html($('#history').html() + '<br><b>You lost!</b> Your opponent\'s face was ' + facenames[d['face']] + '.');
+        }
     }
 
-    $('#input').attr('readonly', state != 'answer' && state != 'ask');
-    $('#victory').attr('disabled', state != 'answer' && state != 'ask');
-    $('#submitter').attr('disabled', state != 'answer' && state != 'ask');
+    if (d['answer'] != undefined)
+        $('#history').html($('#history').html() + '<br><b>Answer: </b>' + d['answer']);
+
+    if (d['question'] != undefined)
+        $('#history').html($('#history').html() + '<br><b>Question: </b>' + d['question']);
+
+    redraw_inputs();
 }
 
 ws.onclose = function() {
@@ -74,19 +100,12 @@ ws.onclose = function() {
     $('#submitter').attr('disabled', true);
 }
 
-function send_question() {
-    if ($('#victory-input').css('display') == 'block')
-        send_victory();
-    else
-        send_text();
-}
-
 function send_victory() {
     ws.send(JSON.stringify({"type":"victory", "face":final_face}));
     $('#history').html($('#history').html() + '<br><b>It\'s ' + facenames[final_face] + '.</b>');
 }
 
-function send_text() {
+function send_question() {
     var text = $('#input').val();
 
     if (text == '')
@@ -94,13 +113,15 @@ function send_text() {
 
     $('#input').val('');
 
-    if (state == 'ask') {
-        $('#history').html($('#history').html() + '<br><b>Question: </b>' + text);
-    } else if (state == 'answer') {
-        $('#history').html($('#history').html() + '<br><b>Answer: </b>' + text);
-    }
+    $('#history').html($('#history').html() + '<br><b>Question: </b>' + text);
 
-    ws.send(JSON.stringify({"type":"question-or-answer", "text":text}));
+    ws.send(JSON.stringify({"type":"question", "text":text}));
+}
+
+function send_answer(ans) {
+    $('#history').html($('#history').html() + '<br><b>Answer: </b>' + ans);
+
+    ws.send(JSON.stringify({"type":"answer", "answer":ans}));
 }
 
 function toggle_face(i) {
@@ -114,23 +135,41 @@ function toggle_face(i) {
         $('#face' + i).css('opacity', '0.3');
     }
 
-    if (remaining_faces == 1) {
-        for (var i = 1; i <= nfaces; i++) {
-            if ($('#face' + i).css('opacity') >= 1) {
-                $('#victory').html("It's " + facenames[i] + "!");
-                final_face = i;
-                break;
-            }
-        }
-        $('#question-input').css('display', 'none');
-        $('#victory-input').css('display', 'block');
-    } else {
-        $('#question-input').css('display', 'block');
-        $('#victory-input').css('display', 'none');
-    }
+    redraw_inputs();
 }
 
 function set_state(s) {
     $('#state').html(statemap[s] ? statemap[s] : s);
     state = s;
+}
+
+function redraw_inputs() {
+    $('#input').attr('readonly', state != 'answer' && state != 'ask');
+    $('#victory').attr('disabled', state != 'answer' && state != 'ask');
+    $('#submitter').attr('disabled', state != 'answer' && state != 'ask');
+    $('#yes-button').attr('disabled', state != 'answer' && state != 'ask');
+    $('#no-button').attr('disabled', state != 'answer' && state != 'ask');
+
+    if (state == 'wait-partner' || state == 'wait-answer' || state == 'ask') {
+        if (remaining_faces == 1) {
+            for (var i = 1; i <= nfaces; i++) {
+                if ($('#face' + i).css('opacity') >= 1) {
+                    $('#victory').html("It's " + facenames[i] + "!");
+                    final_face = i;
+                    break;
+                }
+            }
+            $('#question-input').css('display', 'none');
+            $('#answer-input').css('display', 'none');
+            $('#victory-input').css('display', 'block');
+        } else {
+            $('#question-input').css('display', 'block');
+            $('#answer-input').css('display', 'none');
+            $('#victory-input').css('display', 'none');
+        }
+    } else {
+        $('#question-input').css('display', 'none');
+        $('#answer-input').css('display', 'block');
+        $('#victory-input').css('display', 'none');
+    }
 }
