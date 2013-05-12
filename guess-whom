@@ -43,16 +43,12 @@ get '/admin/livestats' => sub {
     }));
 };
 
-get '/new-game' => sub {
-    shift->render_text(text => 'Pass a facetype.');
-};
-
-get '/new-game/:facetype' => sub {
+get '/new-game/:facetype' => { facetype => undef } => sub {
     my $self = shift;
 
     my $facetype = $self->param('facetype');
 
-    if (!$db->{facetype}{$facetype}) {
+    if (!defined $facetype || !$db->{facetype}{$facetype}) {
         $self->render(text => 'Nope.');
         $db->{stats}{failed_newgame_facetypes}++;
         return;
