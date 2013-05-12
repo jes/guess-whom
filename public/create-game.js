@@ -2,25 +2,35 @@ var windowURL = window.URL || window.webkitURL;
 var input = $('#file-input')[0];
 var canvas = $('#faces-canvas')[0];
 
+var angle = 1;
+
+var image = new Image();
+image.onload = function() {
+    rerender();
+};
+
 $('#file-input').change(function() {
     var file = input.files[0];
 
     if (!file)
         return;
 
-    var url = windowURL.createObjectURL(file);
-    var ctx = canvas.getContext('2d');
-    var image = new Image();
-
-    image.onload = function() {
-        var dim = scale(image, 900, 675);
-        ctx.fillStyle = '#fff';
-        ctx.fill();
-        ctx.drawImage(image, 0, 0, dim.w, dim.h);
-    };
-
-    image.src = url;
+    image.src = windowURL.createObjectURL(file);
 });
+
+function rerender() {
+    var dim = scale(image, 900, 900);
+
+    var ctx = canvas.getContext('2d');
+
+    ctx.save();
+    ctx.translate(900/2, 900/2);
+    ctx.rotate(angle * Math.PI/2);
+    ctx.fillStyle = '#fff';
+    ctx.fillRect(-900/2, -900/2, 900, 900);
+    ctx.drawImage(image, -dim.w/2, -dim.h/2, dim.w, dim.h);
+    ctx.restore();
+}
 
 function scale(img, w, h) {
     var wfactor = img.width / w;
@@ -33,4 +43,14 @@ function scale(img, w, h) {
         console.log("hfactor = " + hfactor);
         return { w: img.width / hfactor, h: h };
     }
-};
+}
+
+function angle_change(amt) {
+    angle += amt;
+    while (angle < 0)
+        angle += 4;
+
+    angle = angle % 4;
+
+    rerender();
+}
