@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use DB_File;
+use DBM::Deep;
 use Mojolicious::Lite;
 use Mojo::JSON;
 
@@ -23,13 +23,13 @@ foreach my $field (qw(host passphrase db)) {
 
 my $host = $config->{host};
 
-my $db = tie my %dbhash, DB_File => $config->{db};
+my $db = DBM::Deep->new($config->{db});
 
-$dbhash{rehashes}++;
+$db->{stats}{rehashes}++;
 
 get '/' => sub { shift->render('index'); };
 
-get '/stats' => sub { shift->render_text(text => $json->encode(\%dbhash)); };
+get '/stats' => sub { shift->render_text(text => $json->encode($db->{stats})); };
 
 get '/livestats' => sub {
     my $self = shift;
@@ -47,17 +47,29 @@ get '/livestats' => sub {
 };
 
 get '/new-game' => sub {
+    shift->render_text(text => 'Pass a facetype.');
+};
+
+get '/new-game/:facetype' => sub {
     my $self = shift;
 
-    $dbhash{newgames}++;
+    my $facetype = $self->param('facetype');
+
+    if (!$db->{facetype}{$facetype}) {
+        $self->render(text => 'Nope.');
+        $db->{stats}{failed_newgame_facetypes}++;
+        return;
+    }
+
+    $db->{stats}{newgames}++;
 
     my $gameid = new_game();
 
     $self->stash(gameid => $gameid);
-    $self->stash(faceid => 1 + int(rand($NHOOKERS)));
+    $self->stash(faceid => 1 + int(rand($db->{facetype}{$facetype}{nfaces})));
     $self->stash(firstuser => 1);
 
-    $game{$gameid}{facetype} = 'cologne-hookers';
+    $game{$gameid}{facetype} = $facetype;
     $game{$gameid}{faces} = [ $self->stash('faceid') ];
 
     render_game($self);
@@ -70,17 +82,19 @@ get '/game/:gameid' => sub {
 
     if (!$game{$gameid} || $game{$gameid}{state} ne 'join') {
         $self->render(text => 'Nope.');
-        $dbhash{failed_joins}++;
+        $db->{stats}{failed_joins}++;
         return;
     }
 
-    $dbhash{http_gamestarts}++;
+    $db->{stats}{http_gamestarts}++;
+
+    my $facetype = $game{$gameid}{facetype};
 
     $self->stash(gameid => $gameid);
 
     $game{$gameid}{state} = 'play';
     do {
-        $self->stash(faceid => 1 + int(rand($NHOOKERS)));
+        $self->stash(faceid => 1 + int(rand($db->{facetype}{$facetype}{nfaces})));
     } while ($self->stash('faceid') == $game{$gameid}{faces}[0]);
 
     push @{ $game{$gameid}{faces} }, $self->stash('faceid');
@@ -93,7 +107,7 @@ websocket '/ws/game/:gameid' => sub {
 
     my $gameid = $self->param('gameid');
 
-    $dbhash{ws_connects}++;
+    $db->{stats}{ws_connects}++;
 
     if (!($game{$gameid} && $game{$gameid}{ws_state} eq 'join')) {
         $self->send($json->encode({error => 'game-in-progress'}));
@@ -153,7 +167,7 @@ websocket '/ws/game/:gameid' => sub {
                 }
 
                 $game{$gameid}{finished} = 1;
-                $dbhash{finished_games}++;
+                $db->{stats}{finished_games}++;
 
                 $self->finish();
                 $otherself->finish();
@@ -174,7 +188,7 @@ websocket '/ws/game/:gameid' => sub {
 
     $self->on(finish => sub {
         if (!$game{$gameid}{finished}) {
-            $dbhash{game_aborts}++;
+            $db->{stats}{game_aborts}++;
         }
 
         if ($game{$gameid}{opposite}{$self}) {
@@ -189,7 +203,7 @@ websocket '/ws/game/:gameid' => sub {
     });
 
     if (@{ $game{$gameid}{websockets} } == 2) {
-        $dbhash{ws_gamestarts}++;
+        $db->{stats}{ws_gamestarts}++;
 
         $game{$gameid}{opposite}{$game{$gameid}{websockets}[0]} = $game{$gameid}{websockets}[1];
         $game{$gameid}{opposite}{$game{$gameid}{websockets}[1]} = $game{$gameid}{websockets}[0];
@@ -227,12 +241,14 @@ sub new_game {
 sub render_game {
     my $self = shift;
 
+    my $gameid = $self->stash('gameid');
+    my $facetype = $game{$gameid}{facetype};
 
-    $self->stash(gameurl => "http://$host/game/" . $self->stash('gameid'));
-    $self->stash(facename => $HOOKERNAME[$self->stash('faceid')]);
-    $self->stash(facetype => $game{$self->stash('gameid')}{facetype});
+    $self->stash(gameurl => "http://$host/game/" . $gameid);
+    $self->stash(facename => $db->{facetype}{$facetype}{facenames}[$self->stash('faceid')]);
+    $self->stash(facetype => $facetype);
 
-    $self->render('game', nfaces => $NHOOKERS, facenames => $json->encode(\@HOOKERNAME));
+    $self->render('game', nfaces => $NHOOKERS, facenames => $json->encode($db->{facetype}{$facetype}{facenames}));
 }
 
 sub destroy_game {
