@@ -2,6 +2,8 @@ var windowURL = window.URL || window.webkitURL;
 var input = $('#file-input')[0];
 var canvas = $('#faces-canvas')[0];
 
+var faces = [];
+
 var angle = 1;
 
 var image = new Image();
@@ -31,15 +33,23 @@ function rerender() {
     ctx.drawImage(image, -dim.w/2, -dim.h/2, dim.w, dim.h);
     ctx.restore();
 
-    var w = enddragx - startdragx;
-    var h = enddragy - startdragy;
-
-    var d = w > h ? w : h;
-
     ctx.fillStyle = 'rgba(255,0,0,0.5)';
 
-    if (d > 5)
-        ctx.fillRect(startdragx - d, startdragy - d, d*2, d*2);
+    for (var i = 0; i < faces.length; i++) {
+        draw_rectangle(ctx, faces[i]);
+    }
+
+    if (in_drag) {
+        var w = enddragx - startdragx;
+        var h = enddragy - startdragy;
+        var d = w > h ? w : h;
+        if (d > 5)
+            draw_rectangle(ctx, [startdragx, startdragy, d]);
+    }
+}
+
+function draw_rectangle(ctx, f) {
+    ctx.fillRect(f[0] - f[2], f[1] - f[2], f[2]*2, f[2]*2);
 }
 
 function scale(img, w, h) {
@@ -60,6 +70,11 @@ function angle_change(amt) {
 
     angle = angle % 4;
 
+    rerender();
+}
+
+function undo() {
+    faces.pop();
     rerender();
 }
 
@@ -90,6 +105,12 @@ function update_drag() {
 
 function end_drag() {
     in_drag = false;
+
+    var w = enddragx - startdragx;
+    var h = enddragy - startdragy;
+    var d = w > h ? w : h;
+    if (d > 5)
+        faces.push([startdragx, startdragy, d]);
 
     rerender();
 }
