@@ -37,10 +37,8 @@ function scale(img, w, h) {
     var hfactor = img.height / h;
 
     if (wfactor > hfactor) {
-        console.log("wf");
         return { w: w, h: img.height / wfactor };
     } else {
-        console.log("hfactor = " + hfactor);
         return { w: img.width / hfactor, h: h };
     }
 }
