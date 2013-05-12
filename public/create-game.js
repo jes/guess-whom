@@ -20,6 +20,32 @@ $('#file-input').change(function() {
     image.src = windowURL.createObjectURL(file);
 });
 
+$('#plus90-button').click(function() {
+    angle_change(1);
+});
+
+$('#minus90-button').click(function() {
+    angle_change(-1);
+});
+
+$('#undo-button').click(function() {
+    undo();
+});
+
+$('#clear-button').click(function() {
+    clear_canvas();
+});
+
+$('#faces-canvas').mousedown(function() {
+    start_drag();
+});
+$('#faces-canvas').mousemove(function() {
+    update_drag();
+});
+$('#faces-canvas').mouseup(function() {
+    end_drag();
+});
+
 function rerender() {
     var dim = scale(image, 900, 900);
 
@@ -78,7 +104,7 @@ function undo() {
     rerender();
 }
 
-function clearcanvas() {
+function clear_canvas() {
     faces.length = 0;
     rerender();
 }
@@ -109,6 +135,9 @@ function update_drag() {
 }
 
 function end_drag() {
+    if (!in_drag)
+        return;
+
     in_drag = false;
 
     var w = enddragx - startdragx;
