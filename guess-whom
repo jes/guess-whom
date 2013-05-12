@@ -43,6 +43,8 @@ get '/admin/livestats' => sub {
     }));
 };
 
+get '/create-game' => sub { shift->render('create-game'); };
+
 get '/new-game/:facetype' => { facetype => undef } => sub {
     my $self = shift;
 
