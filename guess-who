@@ -248,7 +248,8 @@ sub render_game {
     $self->stash(facename => $db->{facetype}{$facetype}{facenames}[$self->stash('faceid')]);
     $self->stash(facetype => $facetype);
 
-    $self->render('game', nfaces => $NHOOKERS, facenames => $json->encode($db->{facetype}{$facetype}{facenames}));
+    my @facenames = @{ $db->{facetype}{$facetype}{facenames} };
+    $self->render('game', nfaces => $NHOOKERS, facenames => $json->encode(\@facenames));
 }
 
 sub destroy_game {
