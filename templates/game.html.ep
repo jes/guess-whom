@@ -1,4 +1,4 @@
-% title "Game $gameid";
+% title "Guess Whom - game $gameid";
 % layout 'default';
 
 <div class="top-part">
