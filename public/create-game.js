@@ -68,6 +68,8 @@ var startdragx, startdragy;
 var enddragx, enddragy;
 
 function start_drag() {
+    window.event.preventDefault();
+
     in_drag = true;
 
     startdragx = enddragx = window.event.clientX - canvas.getBoundingClientRect().left;
