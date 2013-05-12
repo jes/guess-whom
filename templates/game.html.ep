@@ -13,13 +13,17 @@
     <p><b>State: </b><span id="state">Loading...</span></p>
 
     <form id="q-and-a">
-        <input id="input" type="text">
-        <button id="submitter" type="submit">Send</button>
+        <div id="question-input">
+            <input id="input" type="text">
+            <button id="submitter" type="submit">Send</button>
+        </div>
+        <div style="display:none" id="victory-input">
+            <button id="victory" type="submit">It's facename!</button> (or re-enable some more faces to ask more questions)
+        </div>
     </form>
 </div>
 
-<div class="faces" id="faces">
-</div>
+<div class="faces" id="faces"></div>
 
 <script type="text/javascript">
     var gameid = '<%= $gameid %>';

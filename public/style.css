@@ -20,7 +20,12 @@ html, body {
 }
 
 .input {
+    background-color: #fed;
     float: left;
     width: 900px;
     padding: 20px;
+}
+
+.input p {
+    margin: 0;
 }

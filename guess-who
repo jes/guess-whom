@@ -33,7 +33,7 @@ get '/new-game' => sub {
     $self->stash(faceid => 1 + int(rand($NHOOKERS)));
     $self->stash(firstuser => 1);
 
-    $game{$gameid}{first_face} = $self->stash('faceid');
+    $game{$gameid}{faces} = [ $self->stash('faceid') ];
 
     render_game($self);
 };
@@ -55,6 +55,8 @@ get '/game/:gameid' => sub {
         $self->stash(faceid => 1 + int(rand($NHOOKERS)));
     } while ($self->stash('faceid') == $game{$gameid}{first_face});
 
+    push @{ $game{$gameid}{faces} }, $self->stash('faceid');
+
     render_game($self);
 };
 
@@ -63,7 +65,7 @@ websocket '/ws/game/:gameid' => sub {
 
     my $gameid = $self->param('gameid');
 
-    if (!$game{$gameid} || $game{$gameid}{ws_state} ne 'join') {
+    if (!($game{$gameid} && $game{$gameid}{ws_state} eq 'join')) {
         $self->send($json->encode({error => 'game-in-progress'}));
         return;
     }
@@ -75,12 +77,14 @@ websocket '/ws/game/:gameid' => sub {
     $game{$gameid}{n_connected}++;
 
     $self->on(message => sub {
-        my ($self, $msg) = @_;
+        my ($self, $msg_str) = @_;
+
+        print STDERR "Received message: $msg_str\n";
+
+        my $msg = $json->decode($msg_str);
 
         my $playeridx = $game{$gameid}{websockets}[1] && $self == $game{$gameid}{websockets}[1];
         my $otherself = $game{$gameid}{opposite}{$self};
-
-        print STDERR "Received message: $msg\n";
 
         if ($game{$gameid}{ws_state} ne 'play') {
             $self->send($json->encode({error => 'not-ready'}));
@@ -92,21 +96,39 @@ websocket '/ws/game/:gameid' => sub {
             return;
         }
 
-        if ($game{$gameid}{expect_from}[$playeridx] eq 'question') {
-            $self->send($json->encode({state => 'wait-answer'}));
-            $otherself->send($json->encode({state => 'answer', question => $msg}));
+        if ($msg->{type} eq 'question-or-answer') {
+            if ($game{$gameid}{expect_from}[$playeridx] eq 'question') {
+                $self->send($json->encode({state => 'wait-answer'}));
+                $otherself->send($json->encode({state => 'answer', question => $msg->{text}}));
 
-            $game{$gameid}{expect_from}[$playeridx] = 'silence';
-            $game{$gameid}{expect_from}[!$playeridx] = 'answer';
-            return;
-        }
+                $game{$gameid}{expect_from}[$playeridx] = 'silence';
+                $game{$gameid}{expect_from}[!$playeridx] = 'answer';
+            }
 
-        if ($game{$gameid}{expect_from}[$playeridx] eq 'answer') {
-            $self->send($json->encode({state => 'ask'}));
-            $otherself->send($json->encode({state => 'wait-question', answer => $msg}));
+            if ($game{$gameid}{expect_from}[$playeridx] eq 'answer') {
+                $self->send($json->encode({state => 'ask'}));
+                $otherself->send($json->encode({state => 'wait-question', answer => $msg->{text}}));
 
-            $game{$gameid}{expect_from}[$playeridx] = 'question';
-            $game{$gameid}{expect_from}[!$playeridx] = 'silence';
+                $game{$gameid}{expect_from}[$playeridx] = 'question';
+                $game{$gameid}{expect_from}[!$playeridx] = 'silence';
+            }
+        } elsif ($msg->{type} eq 'victory') {
+            my ($loser, $victor, $victorface);
+            if ($game{$gameid}{faces}[!$playeridx] == $msg->{face}) {
+                $victor = $self;
+                $loser = $otherself;
+                $victorface = $game{$gameid}{faces}[$playeridx];
+            } else {
+                $victor = $otherself;
+                $loser = $self;
+                $victorface = $game{$gameid}{faces}[!$playeridx];
+            }
+
+            # TODO: Reveal the opponent's screen?
+            $victor->send($json->encode({state => 'victory'}));
+            $loser->send($json->encode({state => 'defeat', face => $victorface}));
+            $victor->finish();
+            $loser->finish();
         }
     });
 
