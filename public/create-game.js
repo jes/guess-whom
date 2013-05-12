@@ -30,6 +30,16 @@ function rerender() {
     ctx.fillRect(-900/2, -900/2, 900, 900);
     ctx.drawImage(image, -dim.w/2, -dim.h/2, dim.w, dim.h);
     ctx.restore();
+
+    var w = enddragx - startdragx;
+    var h = enddragy - startdragy;
+
+    var d = w > h ? w : h;
+
+    ctx.fillStyle = 'rgba(255,0,0,0.5)';
+
+    if (d > 5)
+        ctx.fillRect(startdragx - d, startdragy - d, d*2, d*2);
 }
 
 function scale(img, w, h) {
@@ -49,6 +59,35 @@ function angle_change(amt) {
         angle += 4;
 
     angle = angle % 4;
+
+    rerender();
+}
+
+var in_drag;
+var startdragx, startdragy;
+var enddragx, enddragy;
+
+function start_drag() {
+    in_drag = true;
+
+    startdragx = enddragx = window.event.clientX - canvas.getBoundingClientRect().left;
+    startdragy = enddragy = window.event.clientY - canvas.getBoundingClientRect().top;
+
+    rerender();
+}
+
+function update_drag() {
+    if (!in_drag)
+        return;
+
+    enddragx = window.event.clientX - canvas.getBoundingClientRect().left;
+    enddragy = window.event.clientY - canvas.getBoundingClientRect().top;
+
+    rerender();
+}
+
+function end_drag() {
+    in_drag = false;
 
     rerender();
 }
