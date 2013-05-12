@@ -5,6 +5,7 @@
 <button onclick="angle_change(1)">+90 deg.</button>
 <button onclick="angle_change(-1)">-90 deg.</button>
 <button onclick="undo()">Undo</button>
+<button onclick="clearcanvas()">Clear</button>
 <canvas id="faces-canvas" width="900px" height="900px" onmousedown="start_drag()" onmouseup="end_drag()" onmousemove="update_drag()"></canvas>
 
 <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.min.js"></script>

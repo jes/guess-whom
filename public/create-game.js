@@ -78,6 +78,11 @@ function undo() {
     rerender();
 }
 
+function clearcanvas() {
+    faces.length = 0;
+    rerender();
+}
+
 var in_drag;
 var startdragx, startdragy;
 var enddragx, enddragy;
