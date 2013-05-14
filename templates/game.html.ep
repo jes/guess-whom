@@ -1,6 +1,8 @@
 % title 'Guess Whom';
 % layout 'default';
 
+<h3><%= $gamename %></h3>
+
 <div class="top-part">
     <div class="face">
     <%= $facename %><br><img src="/face/<%= $facetype %>/<%= $faceid %>.jpg">

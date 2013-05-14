@@ -245,6 +245,7 @@ sub render_game {
 
     my @facenames = @{ $db->{facetype}{$facetype}{facenames} };
     $self->render('game',
+        gamename => $db->{facetype}{$facetype}{name},
         nfaces => $db->{facetype}{$facetype}{nfaces},
         facenames => $json->encode(\@facenames),
         singular => $db->{facetype}{$facetype}{singular},
