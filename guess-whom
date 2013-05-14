@@ -3,8 +3,12 @@
 use strict;
 use warnings;
 
-use DBM::Deep;
 use Mojolicious::Lite;
+use EV;
+
+use AnyEvent::Util;
+use DBM::Deep;
+use Image::Magick;
 use Mojo::JSON;
 
 my %game;
@@ -51,9 +55,19 @@ post '/create-game' => sub {
     my $json_faces = $self->param('json-faces');
     my $image_file = $self->req->upload('file-input');
 
-    $image_file->move_to('public/test.jpg');
+    my $faces = $json->decode($json_faces);
 
-    $self->render_text(text => 'Thanks.');
+    # use fork_call because the image processing is slow
+    fork_call {
+        handle_uploaded_faces($faces, $image_file);
+    } sub {
+        if ($@) {
+            print STDERR "$@";
+            $self->render_text(text => 'Fail.');
+        } else {
+            $self->render_text(text => 'Thanks.');
+        }
+    };
 };
 
 get '/new-game/:facetype' => { facetype => undef } => sub {
@@ -268,4 +282,57 @@ sub destroy_game {
     my $gameid = shift;
 
     delete $game{$gameid};
+}
+
+sub scale_factor {
+    my ($imgw, $imgh, $w, $h) = @_;
+
+    my $wfactor = $imgw / $w;
+    my $hfactor = $imgh / $h;
+
+    if ($wfactor > $hfactor) {
+        return $wfactor;
+    } else {
+        return $hfactor;
+    }
+}
+
+sub handle_uploaded_faces {
+    my ($faces, $file) = @_;
+
+    my $i = 1;
+
+    print STDERR "Asset path = ", $file->asset->path, "\n";
+
+    foreach my $face (@$faces) {
+        my ($cx, $cy, $radius) = @$face;
+
+        my ($tlx, $tly) = ($cx - $radius, $cy - $radius);
+        my $diam = 2 * $radius;
+
+        my $image = Image::Magick->new;
+        my $err = $image->Read($file->asset->path);
+        print STDERR $err if $err;
+
+        my $factor = scale_factor($image->Get('width'), $image->Get('height'), 900, 900);
+
+        my $w = $image->Get('width');
+        my $h = $image->Get('height');
+
+        if ($w < $h) {
+            $tlx -= (900 - $w/$factor) / 2;
+        } else {
+            $tly -= (900 - $h/$factor) / 2;
+        }
+
+        $tlx *= $factor;
+        $tly *= $factor;
+        $diam *= $factor;
+
+        $err = $image->Crop("${diam}x${diam}+$tlx+$tly");
+        print STDERR $err if $err;
+
+        $err = $image->Write('public/bar.jpg');
+        print STDERR $err if $err;
+    }
 }

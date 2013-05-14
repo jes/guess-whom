@@ -4,7 +4,7 @@ var canvas = $('#faces-canvas')[0];
 
 var faces = [];
 
-var angle = 1;
+var angle = 0;
 
 var image = new Image();
 image.onload = function() {
@@ -84,11 +84,10 @@ function scale(img, w, h) {
     var wfactor = img.width / w;
     var hfactor = img.height / h;
 
-    if (wfactor > hfactor) {
+    if (wfactor > hfactor)
         return { w: w, h: img.height / wfactor };
-    } else {
+    else
         return { w: img.width / hfactor, h: h };
-    }
 }
 
 function angle_change(amt) {
