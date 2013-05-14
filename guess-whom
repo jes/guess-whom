@@ -45,6 +45,17 @@ get '/admin/livestats' => sub {
 
 get '/create-game' => sub { shift->render('create-game'); };
 
+post '/create-game' => sub {
+    my $self = shift;
+
+    my $json_faces = $self->param('json-faces');
+    my $image_file = $self->req->upload('file-input');
+
+    $image_file->move_to('public/test.jpg');
+
+    $self->render_text(text => 'Thanks.');
+};
+
 get '/new-game/:facetype' => { facetype => undef } => sub {
     my $self = shift;
 

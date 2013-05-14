@@ -72,6 +72,8 @@ function rerender() {
         if (d > 5)
             draw_rectangle(ctx, [startdragx, startdragy, d]);
     }
+
+    $('#json-faces')[0].value = JSON.stringify(faces);
 }
 
 function draw_rectangle(ctx, f) {

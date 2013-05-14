@@ -1,11 +1,15 @@
 % title 'Create game';
 % layout 'default';
 
-<input type="file" id="file-input">
-<button id="plus90-button">+90 deg.</button>
-<button id="minus90-button">-90 deg.</button>
-<button id="undo-button">Undo</button>
-<button id="clear-button">Clear</button>
+<form action="/create-game" method="post" enctype="multipart/form-data">
+    <input type="file" id="file-input" name="file-input">
+    <button type="button" id="plus90-button">+90 deg.</button>
+    <button type="button" id="minus90-button">-90 deg.</button>
+    <button type="button"id="undo-button">Undo</button>
+    <button type="button"id="clear-button">Clear</button>
+    <input type="hidden" id="json-faces" name="json-faces">
+    <button type="submit">Submit</button>
+</form>
 <canvas id="faces-canvas" width="900px" height="900px" onmousedown="start_drag()" onmouseup="end_drag()" onmousemove="update_drag()"></canvas>
 
 <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.min.js"></script>
