@@ -302,8 +302,6 @@ sub handle_uploaded_faces {
 
     my $i = 1;
 
-    print STDERR "Asset path = ", $file->asset->path, "\n";
-
     foreach my $face (@$faces) {
         my ($cx, $cy, $radius) = @$face;
 
@@ -312,7 +310,7 @@ sub handle_uploaded_faces {
 
         my $image = Image::Magick->new;
         my $err = $image->Read($file->asset->path);
-        print STDERR $err if $err;
+        die $err if $err;
 
         my $factor = scale_factor($image->Get('width'), $image->Get('height'), 900, 900);
 
@@ -330,9 +328,9 @@ sub handle_uploaded_faces {
         $diam *= $factor;
 
         $err = $image->Crop("${diam}x${diam}+$tlx+$tly");
-        print STDERR $err if $err;
+        die $err if $err;
 
         $err = $image->Write('public/bar.jpg');
-        print STDERR $err if $err;
+        die $err if $err;
     }
 }
