@@ -47,10 +47,18 @@ get '/admin/livestats' => sub {
     }));
 };
 
-get '/create-game' => sub { shift->render('create-game'); };
-
-post '/create-game' => sub {
+get '/create-game/:facetype' => sub {
     my $self = shift;
+
+    my $facetype = $self->param('facetype');
+
+    $self->render('create-game', facetype => $facetype);
+};
+
+post '/create-game/:facetype' => sub {
+    my $self = shift;
+
+    my $facetype = $self->param('facetype');
 
     my $json_faces = $self->param('json-faces');
     my $rotations = $self->param('rotations');
@@ -60,7 +68,7 @@ post '/create-game' => sub {
 
     # use fork_call because the image processing is slow
     fork_call {
-        handle_uploaded_faces($faces, $rotations, $image_file);
+        handle_uploaded_faces($facetype, $faces, $rotations, $image_file);
     } sub {
         if ($@) {
             print STDERR "$@";
@@ -299,9 +307,11 @@ sub scale_factor {
 }
 
 sub handle_uploaded_faces {
-    my ($faces, $rotations, $file) = @_;
+    my ($facetype, $faces, $rotations, $file) = @_;
 
     my $i = 1;
+
+    mkdir "public/face/$facetype";
 
     foreach my $face (@$faces) {
         my ($cx, $cy, $radius) = @$face;
@@ -337,7 +347,14 @@ sub handle_uploaded_faces {
         $err = $image->Scale("128x128");
         die $err if $err;
 
-        $err = $image->Write('public/bar.jpg');
+        $err = $image->Write("public/face/$facetype/$i.jpg");
         die $err if $err;
+
+        $i++;
     }
+
+    $db->{facetype}{$facetype}{nfaces} = $i-1;
+    $db->{facetype}{$facetype}{plural} = 'TODOs';
+    $db->{facetype}{$facetype}{singular} = 'TODO';
+    $db->{facetype}{$facetype}{name} = 'TODO';
 }

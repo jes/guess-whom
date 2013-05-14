@@ -1,7 +1,9 @@
 % title 'Create game';
 % layout 'default';
 
-<form action="/create-game" method="post" enctype="multipart/form-data">
+<h3><%= $facetype %></h3>
+
+<form action="/create-game/<%= $facetype %>" method="post" enctype="multipart/form-data">
     <input type="file" id="file-input" name="file-input">
     <button type="button" id="plus90-button">+90 deg.</button>
     <button type="button" id="minus90-button">-90 deg.</button>
