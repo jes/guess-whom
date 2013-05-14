@@ -8,6 +8,7 @@
     <button type="button"id="undo-button">Undo</button>
     <button type="button"id="clear-button">Clear</button>
     <input type="hidden" id="json-faces" name="json-faces">
+    <input type="hidden" id="rotations" name="rotations">
     <button type="submit">Submit</button>
 </form>
 <canvas id="faces-canvas" width="900px" height="900px" onmousedown="start_drag()" onmouseup="end_drag()" onmousemove="update_drag()"></canvas>

@@ -74,6 +74,7 @@ function rerender() {
     }
 
     $('#json-faces')[0].value = JSON.stringify(faces);
+    $('#rotations')[0].value = angle;
 }
 
 function draw_rectangle(ctx, f) {

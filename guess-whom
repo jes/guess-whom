@@ -53,13 +53,14 @@ post '/create-game' => sub {
     my $self = shift;
 
     my $json_faces = $self->param('json-faces');
+    my $rotations = $self->param('rotations');
     my $image_file = $self->req->upload('file-input');
 
     my $faces = $json->decode($json_faces);
 
     # use fork_call because the image processing is slow
     fork_call {
-        handle_uploaded_faces($faces, $image_file);
+        handle_uploaded_faces($faces, $rotations, $image_file);
     } sub {
         if ($@) {
             print STDERR "$@";
@@ -298,7 +299,7 @@ sub scale_factor {
 }
 
 sub handle_uploaded_faces {
-    my ($faces, $file) = @_;
+    my ($faces, $rotations, $file) = @_;
 
     my $i = 1;
 
@@ -310,6 +311,9 @@ sub handle_uploaded_faces {
 
         my $image = Image::Magick->new;
         my $err = $image->Read($file->asset->path);
+        die $err if $err;
+
+        $err = $image->Rotate(degrees => $rotations*90, background => 'white');
         die $err if $err;
 
         my $factor = scale_factor($image->Get('width'), $image->Get('height'), 900, 900);
@@ -328,6 +332,9 @@ sub handle_uploaded_faces {
         $diam *= $factor;
 
         $err = $image->Crop("${diam}x${diam}+$tlx+$tly");
+        die $err if $err;
+
+        $err = $image->Scale("128x128");
         die $err if $err;
 
         $err = $image->Write('public/bar.jpg');
