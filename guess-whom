@@ -69,13 +69,14 @@ post '/create-game/:facetype' => sub {
         return;
     }
 
+    $db->{facetype}{$facetype} = {};
     $db->{facetype}{$facetype}{plural} = 'people';
     $db->{facetype}{$facetype}{singular} = 'person';
     $db->{facetype}{$facetype}{name} = $gamename;
     $db->{facetype}{$facetype}{nfaces} = 0;
     $db->{facetype}{$facetype}{facenames} = [ 'None' ];
 
-    $self->redirect_to("/manage-game/$facetype");
+    $self->redirect_to("/add-faces/$facetype");
 };
 
 get '/manage-game/:facetype' => sub {
