@@ -1,0 +1,4 @@
+% title 'Error';
+% layout 'default';
+
+<p><%= awwsnap %> Something went wrong.</p>

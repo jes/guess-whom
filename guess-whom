@@ -32,6 +32,15 @@ $db->{facetype} ||= {};
 
 $db->{stats}{rehashes}++;
 
+my @AWWSNAP = (
+    "Aww, snap!",
+    "Darn it!",
+    "Oops!",
+);
+helper awwsnap => sub {
+    return $AWWSNAP[rand @AWWSNAP];
+};
+
 get '/' => sub {
     my $self = shift;
 
@@ -150,6 +159,7 @@ post '/add-faces/:facetype' => sub {
             print STDERR "$@";
             $self->render_text(text => 'Fail.');
         } else {
+            # TODO: inflect
             $self->flash(info => 'Now set the names for those faces.');
             $self->redirect_to("/manage-game/$facetype");
         }
@@ -195,7 +205,7 @@ get '/game/:gameid' => sub {
     my $gameid = $self->param('gameid');
 
     if (!$game{$gameid} || $game{$gameid}{state} ne 'join') {
-        $self->render(text => 'Nope.');
+        $self->render('error');
         $db->{stats}{failed_joins}++;
         return;
     }
