@@ -76,3 +76,15 @@ input {
 .facename {
     width: 100px;
 }
+
+.text-sys {
+    color: green;
+}
+.text-opponent {
+    color: red;
+}
+.text-self {
+    color: blue;
+}
+.history {
+}

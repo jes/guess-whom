@@ -64,26 +64,26 @@ ws.onmessage = function(msg) {
 
         if (d['state'] == 'victory') {
             if (d['face'] != undefined) {
-                $('#history').html($('#history').html() + '<br>Opponent guessed <b>' + facenames[d['face']] + '</b>.');
+                history_add('sys', 'Opponent guessed <b>' + facenames[d['face']] + '</b>.');
             }
             if (d['realface'] != undefined) {
-                $('#history').html($('#history').html() + '<br><b>You won!</b> Your opponent\'s ' + singular + ' was <b>' + facenames[d['realface']] + '</b>.');
+                history_add('sys', '<b>You won!</b> Your opponent\'s ' + singular + ' was <b>' + facenames[d['realface']] + '</b>.');
             } else {
-                $('#history').html($('#history').html() + '<br><b>You won!</b>');
+                history_add('sys', '<b>You won!</b>');
             }
         } else if(d['state'] == 'defeat') {
             if (oldstate == 'wait-question') {
-                $('#history').html($('#history').html() + '<br>Opponent guessed corectly.');
+                history_add('sys', 'Opponent guessed correctly.');
             }
-            $('#history').html($('#history').html() + '<br><b>You lost!</b> Your opponent\'s ' + singular + ' was ' + facenames[d['face']] + '.');
+            history_add('sys', '<b>You lost!</b> Your opponent\'s ' + singular + ' was ' + facenames[d['face']] + '.');
         }
     }
 
     if (d['answer'] != undefined)
-        $('#history').html($('#history').html() + '<br><b>Answer: </b>' + d['answer']);
+        history_add('opponent', '<b>Answer: </b>' + d['answer']);
 
     if (d['question'] != undefined)
-        $('#history').html($('#history').html() + '<br><b>Question: </b>' + d['question']);
+        history_add('opponent', '<b>Question: </b>' + d['question']);
 
     redraw_inputs();
 }
@@ -101,7 +101,7 @@ ws.onclose = function() {
 
 function send_victory() {
     ws.send(JSON.stringify({"type":"victory", "face":final_face}));
-    $('#history').html($('#history').html() + '<br><b>It\'s ' + facenames[final_face] + '.</b>');
+    history_add('self', '<b>It\'s' + facenames[final_face] + '.</b>');
 }
 
 function send_question() {
@@ -112,13 +112,13 @@ function send_question() {
 
     $('#input').val('');
 
-    $('#history').html($('#history').html() + '<br><b>Question: </b>' + text);
+    history_add('self', '<b>Question: </b> ' + text);
 
     ws.send(JSON.stringify({"type":"question", "text":text}));
 }
 
 function send_answer(ans) {
-    $('#history').html($('#history').html() + '<br><b>Answer: </b>' + ans);
+    history_add('self', '<b>Answer: </b>' + ans);
 
     ws.send(JSON.stringify({"type":"answer", "answer":ans}));
 }
@@ -171,4 +171,8 @@ function redraw_inputs() {
         $('#answer-input').css('display', 'block');
         $('#victory-input').css('display', 'none');
     }
+}
+
+function history_add(who, html) {
+    $('#history').html($('#history').html() + '<div class="history text-' + who + '">' + html + '</div>');
 }
