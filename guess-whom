@@ -42,7 +42,11 @@ get '/' => sub {
     $self->render('index', facetype => $facetype, gamename => $gamename);
 };
 
-get '/admin/stats' => sub { shift->render_text(text => $json->encode($db->{stats})); };
+get '/admin/stats' => sub {
+    my %stats;
+    $stats{$_} = $db->{stats}{$_} for keys %{ $db->{stats} };
+    shift->render_text(text => $json->encode(\%stats));
+};
 
 get '/admin/livestats' => sub {
     my $self = shift;
