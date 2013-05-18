@@ -7,16 +7,31 @@ html, body {
     text-shadow: 1px 1px white;
 }
 
-body {
+.nav {
     background: rgba(255,255,255,0.5);
-    padding: 10px;
+    border-top: 1px solid #aaa;
+    border-left: 1px solid #aaa;
+    border-right: 1px solid #aaa;
+    border-bottom: none;
+    border-radius: 15px 15px 0px 0px;
+    padding: 0px 15px 0px 15px;
+    margin: 0px;
     margin-top: 20px;
-    border-radius: 15px;
+}
+
+.main {
+    background: rgba(255,255,255,0.5);
+    border-radius: 0px 0px 15px 15px;
     border: 1px solid #aaa;
+    padding: 15px;
 }
 
 html {
     background-image: url(/img/squairy_light.png);
+}
+
+h1, h2 {
+    margin: 0px;
 }
 
 h1 a {

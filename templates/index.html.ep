@@ -1,7 +1,5 @@
-% title 'Guess Whom!';
+% title 'This is Guess Whom!';
 % layout 'default';
-
-<p>This is Guess Whom!</p>
 
 <p>You probably want to <a class="button" href="/create-game">create a game</a>.</p>
 <p>Alternatively, how about a game of <a class="button" href="/new-game/<%= $facetype %>"><%= $gamename %></a>?</p>

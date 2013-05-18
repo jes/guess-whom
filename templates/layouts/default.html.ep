@@ -5,7 +5,10 @@
     <link rel="stylesheet" type="text/css" href="/css/style.css">
 </head>
 <body>
+<div class="nav">
 <h1><a href="/">Guess Whom</a></h1>
+</div>
+<div class="main">
 <h2><%= title %></h2>
 % if (my $info = flash 'info') {
 <div class="alert alert-info">
@@ -13,6 +16,7 @@
 </div>
 % }
 <%= content %>
+</div>
 <div style="clear:both"></div>
 </body>
 </html>
