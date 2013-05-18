@@ -73,6 +73,7 @@ post '/create-game/:facetype' => sub {
     $db->{facetype}{$facetype}{singular} = 'person';
     $db->{facetype}{$facetype}{name} = $gamename;
     $db->{facetype}{$facetype}{nfaces} = 0;
+    $db->{facetype}{$facetype}{facenames} = [ 'None' ];
 
     $self->redirect_to("/manage-game/$facetype");
 };
@@ -429,7 +430,7 @@ sub handle_uploaded_faces {
         die $err if $err;
 
         $i++;
+        $db->{facetype}{$facetype}{nfaces}++;
+        push @{ $db->{facetype}{$facetype}{facenames} }, 'Name';
     }
-
-    $db->{facetype}{$facetype}{nfaces} = $i-1;
 }
