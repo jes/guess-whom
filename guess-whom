@@ -32,7 +32,15 @@ $db->{facetype} ||= {};
 
 $db->{stats}{rehashes}++;
 
-get '/' => sub { shift->render('index'); };
+get '/' => sub {
+    my $self = shift;
+
+    my @faces = keys %{ $db->{facetype} };
+    my $facetype = $faces[rand @faces];
+    my $gamename = $db->{facetype}{$facetype}{name};
+
+    $self->render('index', facetype => $facetype, gamename => $gamename);
+};
 
 get '/admin/stats' => sub { shift->render_text(text => $json->encode($db->{stats})); };
 
