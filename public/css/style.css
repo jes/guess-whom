@@ -1,5 +1,5 @@
 html, body {
-    width: 900px;
+    width: 932px;
     margin: auto;
     font-family: sans-serif;
     font-size: 90%;
@@ -84,6 +84,7 @@ input {
     font-family:arial;
     font-size:15px;
     text-decoration:none;
+    text-shadow: 1px 1px white;
 }
 
 .button {
@@ -101,6 +102,7 @@ input {
     font-size:15px;
     font-weight:bold;
     text-decoration:none;
+    text-shadow: 1px 1px white;
 }
 .button:hover {
     background-color:#dfdfdf;
