@@ -91,6 +91,8 @@ post '/create-game/:facetype' => sub {
     $db->{facetype}{$facetype}{nfaces} = 0;
     $db->{facetype}{$facetype}{facenames} = [ 'None' ];
 
+    $self->flash(info => 'Click in the centre of a face, and then drag to select the face.');
+
     $self->redirect_to("/add-faces/$facetype");
 };
 
