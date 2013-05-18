@@ -18,5 +18,6 @@
 <%= content %>
 <div style="clear:both"></div>
 </div>
+<p class="byline">by James Stanley &lt;<a href="mailto:james@incoherency.co.uk">james@incoherency.co.uk</a>&gt;</p>
 </body>
 </html>
