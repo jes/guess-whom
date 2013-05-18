@@ -1,0 +1,46 @@
+#!/bin/sh
+# init script for guess-whom
+# James Stanley 2013
+
+. /etc/rc.d/init.d/functions
+
+PIDFILE=/var/run/guess-whom.pid
+LOGFILE=/var/log/guess-whom.log
+DIR=/opt/guess-whom
+NAME=guess-whom
+EXECUTE="/opt/guess-whom/guess-whom daemon"
+
+case "$1" in
+  start)
+    echo -n "Starting $NAME:"
+    if status -p $PIDFILE $NAME > /dev/null 2> /dev/null
+    then
+        echo -n " already running."
+        echo_failure
+    else
+        daemon daemonize -a -o $LOGFILE -e $LOGFILE -p $PIDFILE -c $DIR $EXECUTE
+    fi
+    echo
+    ;;
+
+  stop)
+    echo -n "Shutting down $NAME:"
+    killproc -p $PIDFILE
+    echo
+    ;;
+
+  status)
+    status -p $PIDFILE $NAME
+    ;;
+
+  restart)
+    $0 stop
+    $0 start
+    ;;
+
+  *)
+    echo "Usage: $0 {start|stop|status|restart}"
+    exit 1
+esac
+
+exit 0
