@@ -19,7 +19,7 @@ my $json = Mojo::JSON->new;
 
 my $config = plugin 'Config';
 
-foreach my $field (qw(host passphrase db)) {
+foreach my $field (qw(host ws_host passphrase db)) {
     die "no $field in config" unless exists $config->{$field};
 }
 
@@ -371,7 +371,7 @@ sub render_game {
     $self->stash(gameurl => "http://$host/game/" . $gameid);
     $self->stash(facename => $db->{facetype}{$facetype}{facenames}[$self->stash('faceid')]);
     $self->stash(facetype => $facetype);
-    $self->stash(hostname => $config->{host});
+    $self->stash(ws_hostname => $config->{ws_host});
 
     my @facenames = @{ $db->{facetype}{$facetype}{facenames} };
     $self->render('game',

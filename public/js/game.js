@@ -46,7 +46,7 @@ $('#no-button').click(function() {
 
 set_state('connecting');
 
-var ws = new WebSocket('ws://' + hostname + '/ws/game/' + gameid);
+var ws = new WebSocket('ws://' + ws_hostname + '/ws/game/' + gameid);
 
 ws.onopen = function() {
     set_state('connected');
@@ -101,7 +101,7 @@ ws.onclose = function() {
 
 function send_victory() {
     ws.send(JSON.stringify({"type":"victory", "face":final_face}));
-    history_add('self', '<b>It\'s' + facenames[final_face] + '.</b>');
+    history_add('self', '<b>It\'s ' + facenames[final_face] + '.</b>');
 }
 
 function send_question() {
