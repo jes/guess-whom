@@ -54,7 +54,7 @@ get '/' => sub {
 get '/admin/stats' => sub {
     my %stats;
     $stats{$_} = $db->{stats}{$_} for keys %{ $db->{stats} };
-    shift->render_text(text => $json->encode(\%stats));
+    shift->render(text => $json->encode(\%stats));
 };
 
 get '/admin/livestats' => sub {
@@ -66,7 +66,7 @@ get '/admin/livestats' => sub {
     my @games = keys %game;
     my $ngames = @games;
 
-    $self->render_text(text => $json->encode({
+    $self->render(text => $json->encode({
         ws_clients => $nclients,
         livegames => $ngames,
     }));
