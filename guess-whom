@@ -47,15 +47,57 @@ get '/admin/livestats' => sub {
     }));
 };
 
-get '/create-game/:facetype' => sub {
+get '/create-game' => sub {
+    my $self = shift;
+
+    my $facetype = fresh_facetype();
+
+    $self->stash(creating => $facetype);
+
+    $self->render('create-game');
+};
+
+post '/create-game/:facetype' => sub {
+    my $self = shift;
+
+    my $facetype = $self->param('facetype');
+    my $gamename = $self->param('gamename');
+
+    if (!defined $facetype || !defined $gamename) {
+        $self->render_text(text => 'Something is missing!');
+        return;
+    }
+
+    $db->{facetype}{$facetype}{plural} = 'people';
+    $db->{facetype}{$facetype}{singular} = 'person';
+    $db->{facetype}{$facetype}{name} = $gamename;
+    $db->{facetype}{$facetype}{nfaces} = 0;
+
+    $self->redirect_to("/manage-game/$facetype");
+};
+
+get '/manage-game/:facetype' => sub {
     my $self = shift;
 
     my $facetype = $self->param('facetype');
 
-    $self->render('create-game', facetype => $facetype);
+    $self->stash(facetype => $facetype);
+    $self->stash(facenames => $db->{facetype}{$facetype}{facenames});
+    $self->stash(gamename => $db->{facetype}{$facetype}{name});
+    $self->stash(nfaces => $db->{facetype}{$facetype}{nfaces});
+
+    $self->render('manage-game');
 };
 
-post '/create-game/:facetype' => sub {
+get '/add-faces/:facetype' => sub {
+    my $self = shift;
+
+    my $facetype = $self->param('facetype');
+
+    $self->render('add-faces', facetype => $facetype);
+};
+
+post '/add-faces/:facetype' => sub {
     my $self = shift;
 
     my $facetype = $self->param('facetype');
@@ -74,12 +116,20 @@ post '/create-game/:facetype' => sub {
             print STDERR "$@";
             $self->render_text(text => 'Fail.');
         } else {
-            $self->render_text(text => 'Thanks.');
+            $self->redirect_to("/manage-game/$facetype");
         }
     };
 };
 
-get '/new-game/:facetype' => { facetype => undef } => sub {
+get '/new-game' => sub {
+    my $self = shift;
+
+    # TODO: offer a list of facetypes
+
+    $self->render_text(text => 'Nope.');
+};
+
+get '/new-game/:facetype' => sub {
     my $self = shift;
 
     my $facetype = $self->param('facetype');
@@ -306,10 +356,20 @@ sub scale_factor {
     }
 }
 
+sub fresh_facetype {
+    my $facetype;
+
+    do {
+        $facetype = sprintf("%08x", int(rand(2**32)));
+    } while ($db->{facetype}{$facetype});
+
+    return $facetype;
+}
+
 sub handle_uploaded_faces {
     my ($facetype, $faces, $rotations, $file) = @_;
 
-    my $i = 1;
+    my $i = $db->{facetype}{$facetype}{nfaces} + 1;
 
     mkdir "public/face/$facetype";
 
@@ -354,7 +414,4 @@ sub handle_uploaded_faces {
     }
 
     $db->{facetype}{$facetype}{nfaces} = $i-1;
-    $db->{facetype}{$facetype}{plural} = 'TODOs';
-    $db->{facetype}{$facetype}{singular} = 'TODO';
-    $db->{facetype}{$facetype}{name} = 'TODO';
 }

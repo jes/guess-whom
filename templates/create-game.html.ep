@@ -1,19 +1,13 @@
+
 % title 'Create game';
 % layout 'default';
 
-<h3><%= $facetype %></h3>
+<h3><%= $creating %></h3>
 
-<form action="/create-game/<%= $facetype %>" method="post" enctype="multipart/form-data">
-    <input type="file" id="file-input" name="file-input">
-    <button type="button" id="plus90-button">+90 deg.</button>
-    <button type="button" id="minus90-button">-90 deg.</button>
-    <button type="button"id="undo-button">Undo</button>
-    <button type="button"id="clear-button">Clear</button>
-    <input type="hidden" id="json-faces" name="json-faces">
-    <input type="hidden" id="rotations" name="rotations">
+<form action="/create-game/<%= $creating %>" method="post">
+    <label for="gamename">Game name:</label>
+    <input name="gamename" id="gamename" type="text" value="Untitled">
+    <br>
+
     <button type="submit">Submit</button>
 </form>
-<canvas id="faces-canvas" width="900px" height="900px" onmousedown="start_drag()" onmouseup="end_drag()" onmousemove="update_drag()"></canvas>
-
-<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.min.js"></script>
-<script src="/create-game.js" type="text/javascript"></script>

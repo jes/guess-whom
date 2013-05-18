@@ -1,0 +1,13 @@
+
+% title 'Manage game';
+% layout 'default';
+
+<h3><%= $gamename %></h3>
+
+<p><a class="button" href="/add-faces/<%= $facetype %>">Add faces</a></p>
+
+<div class="faces">
+% for my $i (1 .. $nfaces) {
+<div class="face"><%= $facenames->[$i] %><br><img src="/face/<%= $facetype %>/<%= $i %>.jpg"></div>
+% }
+</div>
