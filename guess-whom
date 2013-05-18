@@ -89,7 +89,7 @@ post '/create-game/:facetype' => sub {
     my $gamename = $self->param('gamename');
 
     if (!defined $facetype || !defined $gamename) {
-        $self->render_text(text => 'Something is missing!');
+        $self->render('error');
         return;
     }
 
@@ -157,7 +157,7 @@ post '/add-faces/:facetype' => sub {
     } sub {
         if ($@) {
             print STDERR "$@";
-            $self->render_text(text => 'Fail.');
+            $self->render('error');
         } else {
             # TODO: inflect
             $self->flash(info => 'Now set the names for those faces.');
@@ -171,7 +171,7 @@ get '/new-game' => sub {
 
     # TODO: offer a list of facetypes
 
-    $self->render_text(text => 'Nope.');
+    $self->render('error');
 };
 
 get '/new-game/:facetype' => sub {
@@ -180,7 +180,7 @@ get '/new-game/:facetype' => sub {
     my $facetype = $self->param('facetype');
 
     if (!defined $facetype || !$db->{facetype}{$facetype}) {
-        $self->render(text => 'Nope.');
+        $self->render('error');
         $db->{stats}{failed_newgame_facetypes}++;
         return;
     }
