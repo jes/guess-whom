@@ -4,10 +4,12 @@
 
 <h3><%= $gamename %></h3>
 
-<p><a class="button" href="/add-faces/<%= $facetype %>">Add faces</a></p>
+<p><a class="button" href="/add-faces/<%= $facetype %>">Add faces</a><a class="button" href="/new-game/<%= $facetype %>">New game</a></p>
+<button>Hi</button>
 
 <div class="faces">
 % for my $i (1 .. $nfaces) {
+<!-- TODO: add a box for the user to type a name for each face -->
 <div class="face"><%= $facenames->[$i] %><br><img src="/face/<%= $facetype %>/<%= $i %>.jpg"></div>
 % }
 </div>
