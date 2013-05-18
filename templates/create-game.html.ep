@@ -9,5 +9,5 @@
     <input name="gamename" id="gamename" type="text" value="Untitled">
     <br>
 
-    <button type="submit">Submit</button>
+    <button class="button" type="submit">Submit</button>
 </form>

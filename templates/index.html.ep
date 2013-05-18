@@ -3,4 +3,4 @@
 
 <p>This is Guess Whom!</p>
 
-<p>You probably want to <a href="/create-game">create a game</a>.</p>
+<p>You probably want to <a class="button" href="/create-game">create a game</a>.</p>

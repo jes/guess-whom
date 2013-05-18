@@ -5,6 +5,10 @@ html, body {
     color: #800;
 }
 
+html {
+    background-image: url(/img/squairy_light.png);
+}
+
 .face {
     font-family: monospace;
     text-align: center;
