@@ -1,7 +1,5 @@
-% title 'Guess Whom';
+% title $gamename;
 % layout 'default';
-
-<h3><%= $gamename %></h3>
 
 <div class="top-part">
     <div class="face">

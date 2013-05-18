@@ -27,6 +27,9 @@ my $host = $config->{host};
 
 my $db = DBM::Deep->new($config->{db});
 
+$db->{stats} ||= {};
+$db->{facetype} ||= {};
+
 $db->{stats}{rehashes}++;
 
 get '/' => sub { shift->render('index'); };
