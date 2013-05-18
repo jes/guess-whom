@@ -46,7 +46,7 @@ $('#no-button').click(function() {
 
 set_state('connecting');
 
-var ws = new WebSocket('ws://mojolicious-dev:3000/ws/game/' + gameid);
+var ws = new WebSocket('ws://' + hostname + '/ws/game/' + gameid);
 
 ws.onopen = function() {
     set_state('connected');

@@ -371,6 +371,7 @@ sub render_game {
     $self->stash(gameurl => "http://$host/game/" . $gameid);
     $self->stash(facename => $db->{facetype}{$facetype}{facenames}[$self->stash('faceid')]);
     $self->stash(facetype => $facetype);
+    $self->stash(hostname => $config->{host});
 
     my @facenames = @{ $db->{facetype}{$facetype}{facenames} };
     $self->render('game',
