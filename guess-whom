@@ -10,6 +10,7 @@ use AnyEvent::Util;
 use DBM::Deep;
 use Image::Magick;
 use Mojo::JSON;
+use POSIX qw(tmpnam);
 
 my %game;
 my %ws_clients;
@@ -373,6 +374,9 @@ sub handle_uploaded_faces {
 
     mkdir "public/face/$facetype";
 
+    my $tmp_path = tmpnam();
+    $file->move_to($tmp_path);
+
     foreach my $face (@$faces) {
         my ($cx, $cy, $radius) = @$face;
 
@@ -380,7 +384,7 @@ sub handle_uploaded_faces {
         my $diam = 2 * $radius;
 
         my $image = Image::Magick->new;
-        my $err = $image->Read($file->asset->path);
+        my $err = $image->Read($tmp_path);
         die $err if $err;
 
         $err = $image->Rotate(degrees => $rotations*90, background => 'white');

@@ -35,7 +35,7 @@
 <script type="text/javascript">
     var gameid = '<%= $gameid %>';
     var gameurl = '<%= $gameurl %>';
-    var faceid = '<%= $faceid %>';
+    var faceid = <%= $faceid %>;
     var facetype = '<%= $facetype %>';
     var nfaces = <%= $nfaces %>;
     var facenames = <%== $facenames %>;
