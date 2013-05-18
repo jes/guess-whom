@@ -8,7 +8,7 @@ PIDFILE=/var/run/guess-whom.pid
 LOGFILE=/var/log/guess-whom.log
 DIR=/opt/guess-whom
 NAME=guess-whom
-EXECUTE="/opt/guess-whom/guess-whom daemon"
+EXECUTE="/opt/guess-whom/guess-whom -m production daemon"
 
 case "$1" in
   start)
