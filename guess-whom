@@ -90,6 +90,20 @@ get '/manage-game/:facetype' => sub {
     $self->render('manage-game');
 };
 
+post '/name-faces/:facetype' => sub {
+    my $self = shift;
+
+    my $facetype = $self->param('facetype');
+
+    $db->{facetype}{$facetype}{facenames} = [ 'None' ];
+
+    for my $i (1 .. $db->{facetype}{$facetype}{nfaces}) {
+        push @{ $db->{facetype}{$facetype}{facenames} }, $self->param("facename$i");
+    }
+
+    $self->redirect_to("/manage-game/$facetype");
+};
+
 get '/add-faces/:facetype' => sub {
     my $self = shift;
 

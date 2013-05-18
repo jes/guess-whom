@@ -17,15 +17,15 @@
     <div id="question-input">
         <form id="question-form">
             <input id="input" type="text">
-            <button id="submitter" type="submit">Send</button>
+            <button class="button" id="submitter" type="submit">Send</button>
         </form>
     </div>
     <div style="display:none" id="victory-input">
-        <button id="victory">It's facename!</button> (or re-enable some more faces to ask more questions)
+        <button class="button" id="victory">It's facename!</button> (or re-enable some more faces to ask more questions)
     </div>
     <div style="display:none" id="answer-input">
-        <button id="yes-button">Yes</button>
-        <button id="no-button">No</button>
+        <button class="button" id="yes-button">Yes</button>
+        <button class="button" id="no-button">No</button>
     </div>
     </form>
 </div>
