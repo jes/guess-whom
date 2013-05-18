@@ -27,7 +27,7 @@ html, body {
 }
 
 html {
-    background-image: url(/img/squairy_light.png);
+    background-image: url(/static/img/squairy_light.png);
 }
 
 h1, h2 {
