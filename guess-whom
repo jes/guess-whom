@@ -91,7 +91,7 @@ post '/create-game/:facetype' => sub {
     $db->{facetype}{$facetype}{nfaces} = 0;
     $db->{facetype}{$facetype}{facenames} = [ 'None' ];
 
-    $self->flash(info => 'Click in the centre of a face, and then drag to select the face.');
+    $self->flash(info => 'Choose an image, then click in the centre of a face and drag to select the face.');
 
     $self->redirect_to("/add-faces/$facetype");
 };
@@ -150,6 +150,7 @@ post '/add-faces/:facetype' => sub {
             print STDERR "$@";
             $self->render_text(text => 'Fail.');
         } else {
+            $self->flash(info => 'Now set the names for those faces.');
             $self->redirect_to("/manage-game/$facetype");
         }
     };

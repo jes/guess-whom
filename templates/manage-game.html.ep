@@ -1,8 +1,5 @@
-
-% title 'Manage game';
+% title "Manage game - $gamename";
 % layout 'default';
-
-<h3><%= $gamename %></h3>
 
 <p><a class="button" href="/add-faces/<%= $facetype %>">Add faces</a><a class="button" href="/new-game/<%= $facetype %>">New game</a></p>
 
