@@ -97,7 +97,7 @@ input {
     background-color:#ededed;
     border:1px solid #dcdcdc;
     display:inline-block;
-    color:#777777;
+    color:#777777 !important;
     font-family:arial;
     font-size:15px;
     font-weight:bold;
@@ -142,4 +142,15 @@ input {
     font-weight: bold;
     font-style: italic;
     font-size: 0.8em;
+}
+
+a {
+    color: #400;
+    text-decoration: none;
+}
+a:hover {
+    color: #800;
+}
+a:visited {
+    color: #600;
 }
