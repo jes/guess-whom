@@ -136,8 +136,9 @@ get '/add-faces/:facetype' => sub {
     my $self = shift;
 
     my $facetype = $self->param('facetype');
+    my $gamename = $db->{facetype}{$facetype}{name};
 
-    $self->render('add-faces', facetype => $facetype);
+    $self->render('add-faces', facetype => $facetype, gamename => $gamename);
 };
 
 post '/add-faces/:facetype' => sub {

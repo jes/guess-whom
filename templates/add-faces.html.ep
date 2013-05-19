@@ -1,7 +1,7 @@
 % title 'Add faces';
 % layout 'default';
 
-<h3><%= $facetype %></h3>
+<h3><%= $gamename %></h3>
 
 <form action="/add-faces/<%= $facetype %>" method="post" enctype="multipart/form-data">
     <input type="file" id="file-input" name="file-input">
