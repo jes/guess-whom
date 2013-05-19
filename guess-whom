@@ -44,7 +44,7 @@ helper awwsnap => sub {
 get '/' => sub {
     my $self = shift;
 
-    my @faces = keys %{ $db->{facetype} };
+    my @faces = keys %{ $db->{game_suggestions} };
     my $facetype = $faces[rand @faces];
     my $gamename = $db->{facetype}{$facetype}{name};
 
@@ -154,6 +154,7 @@ post '/add-faces/:facetype' => sub {
     # use fork_call because the image processing is slow
     fork_call {
         handle_uploaded_faces($facetype, $faces, $rotations, $image_file);
+        update_suggestable($facetype);
     } sub {
         if ($@) {
             print STDERR "$@";
@@ -462,5 +463,16 @@ sub handle_uploaded_faces {
         $i++;
         $db->{facetype}{$facetype}{nfaces}++;
         push @{ $db->{facetype}{$facetype}{facenames} }, 'Name';
+    }
+}
+
+sub update_suggestable {
+    my ($facetype) = @_;
+
+    if ($db->{facetype}{$facetype}{name} ne 'Untitled'
+            && $db->{facetype}{$facetype}{nfaces} > 3) {
+        $db->{game_suggestions}{$facetype} = 1;
+    } else {
+        delete $db->{game_suggestions}{$facetype};
     }
 }
