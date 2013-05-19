@@ -7,7 +7,7 @@
 </head>
 <body>
 <div class="nav">
-<a href="/"><img src="/static/img/logo.png"></a>
+<a class="logo" href="/"><img src="/static/img/logo.png"></a>
 </div>
 <div class="main">
 <h2><%= title %></h2>
