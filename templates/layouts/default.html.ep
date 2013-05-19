@@ -3,10 +3,11 @@
 <head>
     <title><%= title %></title>
     <link rel="stylesheet" type="text/css" href="/static/css/style.css">
+    <link rel="icon" type="image/png" href="/static/img/favicon.png">
 </head>
 <body>
 <div class="nav">
-<h1><a href="/">Guess Whom</a></h1>
+<a href="/"><img src="/static/img/logo.png"></a>
 </div>
 <div class="main">
 <h2><%= title %></h2>
