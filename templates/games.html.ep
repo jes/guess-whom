@@ -1,0 +1,19 @@
+% title 'Games';
+% layout 'default';
+
+% for my $game (@{ stash 'games' }) {
+%   my @faces = faceids $game;
+    <div class="game-preview">
+        <a href="/new-game/<%= $game %>">
+        <h3><%= gamename $game %></h3>
+        <div class="faces">
+%       for my $faceid (@faces) {
+            <div class="face">
+                <%= facename $game, $faceid %><br>
+                <img src="/face/<%= $game %>/<%= $faceid %>.jpg">
+            </div>
+%       }
+        </div>
+        </a>
+    </div>
+% }
