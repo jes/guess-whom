@@ -6,19 +6,24 @@
     <link rel="icon" type="image/png" href="/static/img/favicon.png">
 </head>
 <body>
-<div class="nav">
-<a class="logo" href="/"><img src="/static/img/logo.png"></a>
+<div class="wrapper">
+    <div class="nav">
+        <a class="logo" href="/"><img src="/static/img/logo.png"></a>
+    </div>
+    <div class="main">
+        <h2><%= title %></h2>
+        % if (my $info = flash 'info') {
+            <div class="alert alert-info">
+            <%= $info %>
+            </div>
+        % }
+        <%= content %>
+        <div style="clear: both"></div>
+    </div>
+    <div class="push"></div>
 </div>
-<div class="main">
-<h2><%= title %></h2>
-% if (my $info = flash 'info') {
-<div class="alert alert-info">
-<%= $info %>
+<div class="footer">
+    <p class="byline">by James Stanley &lt;<a href="mailto:james@incoherency.co.uk">james@incoherency.co.uk</a>&gt;</p>
 </div>
-% }
-<%= content %>
-<div style="clear:both"></div>
-</div>
-<p class="byline">by James Stanley &lt;<a href="mailto:james@incoherency.co.uk">james@incoherency.co.uk</a>&gt;</p>
 </body>
 </html>

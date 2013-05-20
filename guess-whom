@@ -10,6 +10,7 @@ use AnyEvent::Util;
 use DBM::Deep;
 use Image::Magick;
 use Mojo::JSON;
+use List::Util qw(shuffle);
 use POSIX qw(tmpnam);
 
 my %game;
@@ -37,15 +38,39 @@ my @AWWSNAP = (
     "Darn it!",
     "Oops!",
 );
+
 helper awwsnap => sub {
     return $AWWSNAP[rand @AWWSNAP];
+};
+
+helper gamename => sub {
+    my ($self, $facetype) = @_;
+    return $facetype ? $db->{facetype}{$facetype}{name} : '';
+};
+
+helper faceids => sub {
+    my ($self, $facetype) = @_;
+
+    return () if !defined $facetype;
+
+    my @faceids = shuffle (1 .. $db->{facetype}{$facetype}{nfaces});
+
+    return @faceids[0..5];
+};
+
+helper facename => sub {
+    my ($self, $facetype, $faceid) = @_;
+
+    return '' if !defined $facetype or !defined $faceid;
+
+    return $db->{facetype}{$facetype}{facenames}[$faceid];
 };
 
 get '/' => sub {
     my $self = shift;
 
-    my @faces = keys %{ $db->{game_suggestions} };
-    my $facetype = $faces[rand @faces];
+    my @games = keys %{ $db->{game_suggestions} };
+    my $facetype = $games[rand @games];
     my $gamename = $db->{facetype}{$facetype}{name};
 
     $self->render('index', facetype => $facetype, gamename => $gamename);
@@ -70,6 +95,14 @@ get '/admin/livestats' => sub {
         ws_clients => $nclients,
         livegames => $ngames,
     }));
+};
+
+get '/games' => sub {
+    my $self = shift;
+
+    my @games = (shuffle keys %{ $db->{game_suggestions} })[0 .. 4];
+
+    $self->render('games', games => \@games);
 };
 
 get '/create-game' => sub {
