@@ -52,9 +52,13 @@ h1 a:hover {
     text-align: center;
     float: left;
     width: 150px;
-    height: 150px;
+    height: 140px;
     padding-top: 5px;
     padding-bottom: 5px;
+}
+
+.right {
+    float: right;
 }
 
 .faces {
@@ -130,6 +134,12 @@ input {
 }
 .text-self {
     color: blue;
+}
+.by-opponent {
+    float: right;
+}
+.by-self {
+    float: left;
 }
 .history {
 }

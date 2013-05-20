@@ -17,6 +17,7 @@ var state = 'loading';;
 
 var remaining_faces = nfaces - 1;
 var final_face;
+var guessed_face;
 
 var html = '';
 for (var i = 1; i <= nfaces; i++) {
@@ -64,26 +65,29 @@ ws.onmessage = function(msg) {
 
         if (d['state'] == 'victory') {
             if (d['face'] != undefined) {
-                history_add('sys', 'Opponent guessed <b>' + facenames[d['face']] + '</b>.');
+                history_add('opponent', 'self', '<b>Opponent:</b> It\'s ' + facenames[d['face']] + '.');
             }
             if (d['realface'] != undefined) {
-                history_add('sys', '<b>You won!</b> Your opponent\'s ' + singular + ' was <b>' + facenames[d['realface']] + '</b>.');
+                $('#opponent-face').html(facenames[d['realface']] + '<br><img src="/face/' + facetype + '/' + d['realface'] + '.jpg">');
+                history_add('sys', 'self', '<b>You won!</b> Your opponent\'s ' + singular + ' was <b>' + facenames[d['realface']] + '</b>.');
             } else {
-                history_add('sys', '<b>You won!</b>');
+                $('#opponent-face').html(facenames[guessed_face] + '<br><img src="/face/' + facetype + '/' + guessed_face + '.jpg">');
+                history_add('sys', 'self', '<b>You won!</b>');
             }
         } else if(d['state'] == 'defeat') {
             if (oldstate == 'wait-question') {
-                history_add('sys', 'Opponent guessed correctly.');
+                history_add('opponent', 'self', '<b>Opponent:</b> It\'s ' + facenames[faceid] + '.');
             }
-            history_add('sys', '<b>You lost!</b> Your opponent\'s ' + singular + ' was ' + facenames[d['face']] + '.');
+            $('#opponent-face').html(facenames[d['face']] + '<br><img src="/face/' + facetype + '/' + d['face'] + '.jpg">');
+            history_add('sys', 'self', '<b>You lost!</b> Your opponent\'s ' + singular + ' was ' + facenames[d['face']] + '.');
         }
     }
 
     if (d['answer'] != undefined)
-        history_add('opponent', '<b>Answer: </b>' + d['answer']);
+        history_add('opponent', 'opponent', '<b>Opponent: </b>' + d['answer']);
 
     if (d['question'] != undefined)
-        history_add('opponent', '<b>Question: </b>' + d['question']);
+        history_add('opponent', 'self', '<b>Opponent: </b>' + d['question']);
 
     redraw_inputs();
 }
@@ -100,8 +104,9 @@ ws.onclose = function() {
 }
 
 function send_victory() {
+    guessed_face = final_face;
     ws.send(JSON.stringify({"type":"victory", "face":final_face}));
-    history_add('self', '<b>It\'s ' + facenames[final_face] + '.</b>');
+    history_add('self', 'opponent', '<b>You: </b>It\'s ' + facenames[final_face] + '.');
 }
 
 function send_question() {
@@ -112,13 +117,13 @@ function send_question() {
 
     $('#input').val('');
 
-    history_add('self', '<b>Question: </b> ' + text);
+    history_add('self', 'opponent', '<b>You: </b> ' + text);
 
     ws.send(JSON.stringify({"type":"question", "text":text}));
 }
 
 function send_answer(ans) {
-    history_add('self', '<b>Answer: </b>' + ans);
+    history_add('self', 'self', '<b>You: </b>' + ans);
 
     ws.send(JSON.stringify({"type":"answer", "answer":ans}));
 }
@@ -173,6 +178,6 @@ function redraw_inputs() {
     }
 }
 
-function history_add(who, html) {
-    $('#history').html($('#history').html() + '<div class="history text-' + who + '">' + html + '</div>');
+function history_add(who, showby, html) {
+    $('#history').html($('#history').html() + '<div class="history by-' + showby + ' text-' + who + '">' + html + '</div><br>');
 }

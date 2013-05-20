@@ -6,6 +6,10 @@
     <%= $facename %><br><img src="/face/<%= $facetype %>/<%= $faceid %>.jpg">
     </div>
 
+    <div id="opponent-face" class="right face">
+    Opponent<br><img src="/static/img/qmark.png">
+    </div>
+
     <div id="history"></div>
 </div>
 
