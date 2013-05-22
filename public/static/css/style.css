@@ -195,12 +195,12 @@ a:visited {
 .footer {
     border-top: solid 2px #222;
     background-color: #666;
-    padding-top: 20px;
     color: #bbb;
     text-shadow: 1px 1px #444;
 }
 
 .footer-wrapper {
+    margin-top: 20px;
     width: 932px;
     margin: auto;
 }
