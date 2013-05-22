@@ -7,8 +7,10 @@
 </head>
 <body>
 <div class="wrapper">
-    <div class="nav">
-        <a class="logo" href="/"><img src="/static/img/logo.png"></a>
+    <div class="wrapper2">
+        <div class="nav">
+            <a class="logo" href="/"><img src="/static/img/logo.png"></a>
+        </div>
     </div>
     <div class="main">
         <h2><%= title %></h2>

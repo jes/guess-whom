@@ -21,7 +21,6 @@ html, body {
     border-radius: 0px 15px 0px 0px;
     padding: 2px 2px 2px 2px;
     margin: 0px;
-    margin-top: 20px;
 }
 
 a.logo {
@@ -185,6 +184,10 @@ a:visited {
     margin: 0 auto -150px;
 }
 
-.footer, .push {
+.wrapper2 {
+    padding-top: 20px;
+}
+
+.push, .footer {
     height: 150px;
 }
