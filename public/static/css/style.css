@@ -3,7 +3,6 @@
 }
 
 html, body {
-    width: 932px;
     height: 100%;
     margin: auto;
     font-family: sans-serif;
@@ -167,7 +166,7 @@ input {
 }
 
 a {
-    color: #400;
+    color: #300;
     text-decoration: none;
 }
 a:hover {
@@ -182,6 +181,7 @@ a:visited {
     height: auto !important;
     height: 100%;
     margin: 0 auto -150px;
+    width: 932px;
 }
 
 .wrapper2 {
@@ -189,5 +189,25 @@ a:visited {
 }
 
 .push, .footer {
-    height: 150px;
+    height: 147px;
+}
+
+.footer {
+    border-top: solid 2px #222;
+    background-color: #666;
+    padding-top: 20px;
+    color: #bbb;
+    text-shadow: 1px 1px #444;
+}
+
+.footer-wrapper {
+    width: 932px;
+    margin: auto;
+}
+
+.footer a {
+    color: #ddd;
+}
+.footer a:hover {
+    color: #bbb;
 }

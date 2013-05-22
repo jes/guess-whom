@@ -25,7 +25,9 @@
     <div class="push"></div>
 </div>
 <div class="footer">
-    <p class="byline">by James Stanley &lt;<a href="mailto:james@incoherency.co.uk">james@incoherency.co.uk</a>&gt;</p>
+    <div class="footer-wrapper">
+        <p class="byline">by James Stanley &lt;<a href="mailto:james@incoherency.co.uk">james@incoherency.co.uk</a>&gt;</p>
+    </div>
 </div>
 </body>
 </html>
