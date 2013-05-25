@@ -8,8 +8,17 @@
 <body>
 <div class="wrapper">
     <div class="wrapper2">
-        <div class="nav">
+        <div class="header">
             <a class="logo" href="/"><img src="/static/img/logo.png"></a>
+            <div class="nav">
+                <ul class="nav">
+                    <li><a class="nav" href="/about">About</a></li>
+                    <li><a class="nav" href="/games">Games</a></li>
+                    <li><a class="nav" href="#">Bar</a></li>
+                    <li><a class="nav" href="#">Foo</a></li>
+                </ul>
+            </div>
+            <div style="clear: both"></div>
         </div>
     </div>
     <div class="main">

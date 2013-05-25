@@ -76,6 +76,8 @@ get '/' => sub {
     $self->render('index', facetype => $facetype, gamename => $gamename);
 };
 
+get '/about' => sub { shift->render('about') };
+
 get '/admin/stats' => sub {
     my %stats;
     $stats{$_} = $db->{stats}{$_} for keys %{ $db->{stats} };
