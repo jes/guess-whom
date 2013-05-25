@@ -218,6 +218,10 @@ a:visited {
     padding-top: 20px;
 }
 
+.wrapper3 {
+    padding-bottom: 20px;
+}
+
 .push, .footer {
     height: 147px;
 }

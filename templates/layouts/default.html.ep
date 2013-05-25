@@ -21,15 +21,17 @@
             <div style="clear: both"></div>
         </div>
     </div>
-    <div class="main">
-        <h2><%= title %></h2>
-        % if (my $info = flash 'info') {
-            <div class="alert alert-info">
-            <%= $info %>
-            </div>
-        % }
-        <%= content %>
-        <div style="clear: both"></div>
+    <div class="wrapper3">
+        <div class="main">
+            <h2><%= title %></h2>
+            % if (my $info = flash 'info') {
+                <div class="alert alert-info">
+                <%= $info %>
+                </div>
+            % }
+            <%= content %>
+            <div style="clear: both"></div>
+        </div>
     </div>
     <div class="push"></div>
 </div>
