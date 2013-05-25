@@ -163,6 +163,11 @@ post '/name-faces/:facetype' => sub {
 
     my $facetype = $self->param('facetype');
 
+    if (!$self->session("managing.$facetype")) {
+        $self->render('error');
+        return;
+    }
+
     $db->{facetype}{$facetype}{facenames} = [ 'None' ];
 
     for my $i (1 .. $db->{facetype}{$facetype}{nfaces}) {
@@ -178,6 +183,11 @@ get '/add-faces/:facetype' => sub {
     my $facetype = $self->param('facetype');
     my $gamename = $db->{facetype}{$facetype}{name};
 
+    if (!$self->session("managing.$facetype")) {
+        $self->render('error');
+        return;
+    }
+
     $self->render('add-faces', facetype => $facetype, gamename => $gamename);
 };
 
@@ -185,6 +195,11 @@ post '/add-faces/:facetype' => sub {
     my $self = shift;
 
     my $facetype = $self->param('facetype');
+
+    if (!$self->session("managing.$facetype")) {
+        $self->render('error');
+        return;
+    }
 
     my $json_faces = $self->param('json-faces');
     my $rotations = $self->param('rotations');
