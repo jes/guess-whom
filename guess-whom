@@ -214,7 +214,7 @@ get '/new-game/:facetype' => sub {
 
     my $facetype = $self->param('facetype');
 
-    if (!defined $facetype || !$db->{facetype}{$facetype}) {
+    if (!defined $facetype || !$db->{facetype}{$facetype} || $db->{facetype}{$facetype}{nfaces} < 2) {
         $self->render('error');
         $db->{stats}{failed_newgame_facetypes}++;
         return;
@@ -225,11 +225,9 @@ get '/new-game/:facetype' => sub {
     my $gameid = new_game();
 
     $self->stash(gameid => $gameid);
-    $self->stash(faceid => 1 + int(rand($db->{facetype}{$facetype}{nfaces})));
-    $self->stash(firstuser => 1);
 
     $game{$gameid}{facetype} = $facetype;
-    $game{$gameid}{faces} = [ $self->stash('faceid') ];
+    $game{$gameid}{faces} = [];
 
     render_game($self);
 };
@@ -247,16 +245,7 @@ get '/game/:gameid' => sub {
 
     $db->{stats}{http_gamestarts}++;
 
-    my $facetype = $game{$gameid}{facetype};
-
     $self->stash(gameid => $gameid);
-
-    $game{$gameid}{state} = 'play';
-    do {
-        $self->stash(faceid => 1 + int(rand($db->{facetype}{$facetype}{nfaces})));
-    } while ($self->stash('faceid') == $game{$gameid}{faces}[0]);
-
-    push @{ $game{$gameid}{faces} }, $self->stash('faceid');
 
     render_game($self);
 };
@@ -268,7 +257,7 @@ websocket '/ws/game/:gameid' => sub {
 
     $db->{stats}{ws_connects}++;
 
-    if (!($game{$gameid} && $game{$gameid}{ws_state} eq 'join')) {
+    if (!($game{$gameid} && $game{$gameid}{state} eq 'join')) {
         $self->send($json->encode({error => 'game-in-progress'}));
         return;
     }
@@ -278,6 +267,15 @@ websocket '/ws/game/:gameid' => sub {
     push @{ $game{$gameid}{websockets} }, $self;
 
     $game{$gameid}{n_connected}++;
+
+    my $takenface = @{ $game{$gameid}{faces} } ? $game{$gameid}{faces}[0] : -1;
+    my $facetype = $game{$gameid}{facetype};
+    my $faceid;
+    do {
+        $faceid = 1 + int(rand($db->{facetype}{$facetype}{nfaces}));
+    } while ($faceid == $takenface);
+    push @{ $game{$gameid}{faces} }, $faceid;
+    $self->send($json->encode({faceid => $faceid}));
 
     $self->on(message => sub {
         my ($self, $msg_str) = @_;
@@ -289,7 +287,7 @@ websocket '/ws/game/:gameid' => sub {
         my $playeridx = $game{$gameid}{websockets}[1] && $self == $game{$gameid}{websockets}[1];
         my $otherself = $game{$gameid}{opposite}{$self};
 
-        if ($game{$gameid}{ws_state} ne 'play') {
+        if ($game{$gameid}{state} ne 'play') {
             $self->send($json->encode({error => 'not-ready'}));
             return;
         }
@@ -366,7 +364,7 @@ websocket '/ws/game/:gameid' => sub {
 
         $game{$gameid}{opposite}{$game{$gameid}{websockets}[0]} = $game{$gameid}{websockets}[1];
         $game{$gameid}{opposite}{$game{$gameid}{websockets}[1]} = $game{$gameid}{websockets}[0];
-        $game{$gameid}{ws_state} = 'play';
+        $game{$gameid}{state} = 'play';
         $game{$gameid}{expect_from}[0] = 'question';
         $game{$gameid}{expect_from}[1] = 'silence';
 
@@ -391,7 +389,6 @@ sub new_game {
 
     $game{$id} = {
         state => 'join',
-        ws_state => 'join',
     };
 
     return $id;
@@ -404,7 +401,6 @@ sub render_game {
     my $facetype = $game{$gameid}{facetype};
 
     $self->stash(gameurl => "http://$host/game/" . $gameid);
-    $self->stash(facename => $db->{facetype}{$facetype}{facenames}[$self->stash('faceid')]);
     $self->stash(facetype => $facetype);
     $self->stash(ws_hostname => $config->{ws_host});
 

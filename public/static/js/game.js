@@ -15,18 +15,10 @@ var statemap = {
 
 var state = 'loading';;
 
+var faceid;
 var remaining_faces = nfaces - 1;
 var final_face;
 var guessed_face;
-
-var html = '';
-for (var i = 1; i <= nfaces; i++) {
-    if (i == faceid)
-        continue;
-
-    html += '<div class="face" id="face' + i + '" onclick="toggle_face(' + i + ')">' + facenames[i] + '<br><img src="/face/' + facetype + '/' + i + '.jpg"></div>';
-}
-$('#faces').html(html);
 
 $('#question-form').submit(function() {
     send_question();
@@ -88,6 +80,11 @@ ws.onmessage = function(msg) {
 
     if (d['question'] != undefined)
         history_add('opponent', 'self', '<b>Opponent: </b>' + d['question']);
+
+    if (d['faceid'] != undefined) {
+        faceid = d['faceid'];
+        draw_faces();
+    }
 
     redraw_inputs();
 }
@@ -180,4 +177,17 @@ function redraw_inputs() {
 
 function history_add(who, showby, html) {
     $('#history').html($('#history').html() + '<div class="history by-' + showby + ' text-' + who + '">' + html + '</div><br>');
+}
+
+function draw_faces() {
+    var html = '';
+    for (var i = 1; i <= nfaces; i++) {
+        if (i == faceid)
+            continue;
+
+        html += '<div class="face" id="face' + i + '" onclick="toggle_face(' + i + ')">' + facenames[i] + '<br><img src="/face/' + facetype + '/' + i + '.jpg"></div>';
+    }
+    $('#faces').html(html);
+
+    $('#myface').html(facenames[faceid] + '<br><img src="/face/' + facetype + '/' + faceid + '.jpg">');
 }
