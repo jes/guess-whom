@@ -135,6 +135,8 @@ post '/create-game/:facetype' => sub {
 
     $self->flash(info => 'Choose an image, then click in the centre of a face and drag to select the face.');
 
+    $self->session("managing.$facetype" => 1);
+
     $self->redirect_to("/add-faces/$facetype");
 };
 
@@ -142,6 +144,11 @@ get '/manage-game/:facetype' => sub {
     my $self = shift;
 
     my $facetype = $self->param('facetype');
+
+    if (!$self->session("managing.$facetype")) {
+        $self->render('error');
+        return;
+    }
 
     $self->stash(facetype => $facetype);
     $self->stash(facenames => $db->{facetype}{$facetype}{facenames});
