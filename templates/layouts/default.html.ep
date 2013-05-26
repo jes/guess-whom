@@ -14,8 +14,6 @@
                 <ul class="nav">
                     <li><a class="nav" href="/about">About</a></li>
                     <li><a class="nav" href="/games">Games</a></li>
-                    <li><a class="nav" href="#">Bar</a></li>
-                    <li><a class="nav" href="#">Foo</a></li>
                 </ul>
             </div>
             <div style="clear: both"></div>
