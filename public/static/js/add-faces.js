@@ -36,14 +36,14 @@ $('#clear-button').click(function() {
     clear_canvas();
 });
 
-$('#faces-canvas').mousedown(function() {
-    start_drag();
+$('#faces-canvas').mousedown(function(e) {
+    return start_drag(e);
 });
-$('#faces-canvas').mousemove(function() {
-    update_drag();
+$('#faces-canvas').mousemove(function(e) {
+    return update_drag(e);
 });
-$('#faces-canvas').mouseup(function() {
-    end_drag();
+$('#faces-canvas').mouseup(function(e) {
+    return end_drag(e);
 });
 
 function rerender() {
@@ -115,28 +115,33 @@ var in_drag;
 var startdragx, startdragy;
 var enddragx, enddragy;
 
-function start_drag() {
-    window.event.preventDefault();
+function start_drag(e) {
+    if (e == undefined)
+        return;
 
     in_drag = true;
 
-    startdragx = enddragx = window.event.clientX - canvas.getBoundingClientRect().left;
-    startdragy = enddragy = window.event.clientY - canvas.getBoundingClientRect().top;
+    startdragx = enddragx = e.clientX - canvas.getBoundingClientRect().left;
+    startdragy = enddragy = e.clientY - canvas.getBoundingClientRect().top;
 
     rerender();
+
+    return false;
 }
 
-function update_drag() {
-    if (!in_drag)
+function update_drag(e) {
+    if (e == undefined || !in_drag)
         return;
 
-    enddragx = window.event.clientX - canvas.getBoundingClientRect().left;
-    enddragy = window.event.clientY - canvas.getBoundingClientRect().top;
+    enddragx = e.clientX - canvas.getBoundingClientRect().left;
+    enddragy = e.clientY - canvas.getBoundingClientRect().top;
 
     rerender();
+
+    return false;
 }
 
-function end_drag() {
+function end_drag(e) {
     if (!in_drag)
         return;
 
@@ -149,4 +154,6 @@ function end_drag() {
         faces.push([startdragx, startdragy, d]);
 
     rerender();
+
+    return false;
 }
