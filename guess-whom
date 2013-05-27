@@ -505,6 +505,12 @@ sub handle_uploaded_faces {
         $tly *= $factor;
         $diam *= $factor;
 
+        $err = $image->Border(bordercolor => 'white', width => 128, height => 128);
+        die $err if $err;
+
+        $tlx += 128;
+        $tly += 128;
+
         $err = $image->Crop("${diam}x${diam}+$tlx+$tly");
         die $err if $err;
 
