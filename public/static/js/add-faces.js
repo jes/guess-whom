@@ -157,3 +157,5 @@ function end_drag(e) {
 
     return false;
 }
+
+rerender();
