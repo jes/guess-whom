@@ -56,6 +56,9 @@ ws.onmessage = function(msg) {
         set_state(d['state']);
 
         if (d['state'] == 'victory') {
+            if (d['timeout']) {
+                history_add('sys', 'self', 'Opponent timed out.');
+            }
             if (d['face'] != undefined) {
                 history_add('opponent', 'self', '<b>Opponent:</b> It\'s ' + facenames[d['face']] + '.');
             }
@@ -67,7 +70,9 @@ ws.onmessage = function(msg) {
                 history_add('sys', 'self', '<b>You won!</b>');
             }
         } else if(d['state'] == 'defeat') {
-            if (oldstate == 'wait-question') {
+            if (d['timeout']) {
+                history_add('sys', 'self', 'You timed out.');
+            } else if (oldstate == 'wait-question') {
                 history_add('opponent', 'self', '<b>Opponent:</b> It\'s ' + facenames[faceid] + '.');
             }
             $('#opponent-face').html(facenames[d['face']] + '<br><img src="/face/' + facetype + '/' + d['face'] + '.jpg">');
