@@ -33,7 +33,7 @@ $db->{facetype} ||= {};
 
 $db->{stats}{rehashes}++;
 
-my $TURN_TIMER = 10;
+my $TURN_TIMER = 60;
 
 my @AWWSNAP = (
     "Aww, snap!",
