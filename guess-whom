@@ -33,6 +33,8 @@ $db->{facetype} ||= {};
 
 $db->{stats}{rehashes}++;
 
+my $TURN_TIMER = 10;
+
 my @AWWSNAP = (
     "Aww, snap!",
     "Darn it!",
@@ -316,42 +318,34 @@ websocket '/ws/game/:gameid' => sub {
             return;
         }
 
-        if ($game{$gameid}{expect_from}[$playeridx] eq 'silence') {
-            $self->send($json->encode({error => 'shutup'}));
-            return;
-        }
-
+        # TODO: refactor into hash of message type to handler function
         if ($msg->{type} eq 'question') {
             if ($game{$gameid}{expect_from}[$playeridx] eq 'question') {
                 $self->send($json->encode({state => 'wait-answer'}));
                 $otherself->send($json->encode({state => 'answer', question => $msg->{text}}));
 
+                Mojo::IOLoop->remove($game{$gameid}{timer});
+                $game{$gameid}{timer} = Mojo::IOLoop->timer($TURN_TIMER => sub {
+                    end_game($gameid, winner => $playeridx, timeout => 1);
+                });
+
                 $game{$gameid}{expect_from}[$playeridx] = 'silence';
                 $game{$gameid}{expect_from}[!$playeridx] = 'answer';
-            }
-
-            if ($game{$gameid}{expect_from}[$playeridx] eq 'answer') {
-                $self->send($json->encode({state => 'ask'}));
-                $otherself->send($json->encode({state => 'wait-question', answer => $msg->{text}}));
-
-                $game{$gameid}{expect_from}[$playeridx] = 'question';
-                $game{$gameid}{expect_from}[!$playeridx] = 'silence';
+            } else {
+                $self->send($json->encode({error => 'shutup'}));
             }
         } elsif ($msg->{type} eq 'victory') {
             if ($game{$gameid}{expect_from}[$playeridx] eq 'question') {
                 if ($game{$gameid}{faces}[!$playeridx] == $msg->{face}) {
-                    $self->send($json->encode({state => 'victory'}));
-                    $otherself->send($json->encode({state => 'defeat', face => $game{$gameid}{faces}[$playeridx]}));
+                    end_game($gameid, winner => $playeridx);
                 } else {
-                    $otherself->send($json->encode({state => 'victory', face => $msg->{face}, realface => $game{$gameid}{faces}[$playeridx]}));
-                    $self->send($json->encode({state => 'defeat', face => $game{$gameid}{faces}[!$playeridx]}));
+                    end_game($gameid,
+                        winner => !$playeridx,
+                        guessed => $msg->{face},
+                    );
                 }
-
-                $game{$gameid}{finished} = 1;
-                $db->{stats}{finished_games}++;
-
-                $self->finish();
-                $otherself->finish();
+            } else {
+                $self->send($json->encode({error => 'shutup'}));
             }
         } elsif ($msg->{type} eq 'answer') {
             if ($game{$gameid}{expect_from}[$playeridx] eq 'answer') {
@@ -361,8 +355,15 @@ websocket '/ws/game/:gameid' => sub {
                 $self->send($json->encode({state => 'ask'}));
                 $otherself->send($json->encode({state => 'wait-question', answer => $answer}));
 
+                Mojo::IOLoop->remove($game{$gameid}{timer});
+                $game{$gameid}{timer} = Mojo::IOLoop->timer($TURN_TIMER => sub {
+                    end_game($gameid, winner => $playeridx, timeout => 1);
+                });
+
                 $game{$gameid}{expect_from}[$playeridx] = 'question';
                 $game{$gameid}{expect_from}[!$playeridx] = 'silence';
+            } else {
+                $self->send($json->encode({error => 'shutup'}));
             }
         }
     });
@@ -391,6 +392,12 @@ websocket '/ws/game/:gameid' => sub {
         $game{$gameid}{state} = 'play';
         $game{$gameid}{expect_from}[0] = 'question';
         $game{$gameid}{expect_from}[1] = 'silence';
+
+        $game{$gameid}{timer} = Mojo::IOLoop->timer($TURN_TIMER => sub {
+            end_game($gameid,
+                winner => 1,
+                timeout => 1);
+        });
 
         $game{$gameid}{websockets}[0]->send($json->encode({state => 'ask'}));
         $game{$gameid}{websockets}[1]->send($json->encode({state => 'wait-question'}));
@@ -535,4 +542,36 @@ sub update_suggestable {
     } else {
         delete $db->{game_suggestions}{$facetype};
     }
+}
+
+sub end_game {
+    my ($gameid, %opts) = @_;
+
+    Mojo::IOLoop->remove($game{$gameid}{timer});
+
+    $game{$gameid}{finished} = 1;
+    $db->{stats}{finished_games}++;
+
+    my $win = $game{$gameid}{websockets}[$opts{winner}];
+    my $lose = $game{$gameid}{websockets}[!$opts{winner}];
+
+    my $winmsg = {state => 'victory'};
+    my $losemsg = {state => 'defeat', face => $game{$gameid}{faces}[$opts{winner}]};
+
+    if (defined $opts{guessed}) {
+        $winmsg->{face} = $opts{guessed};
+        $winmsg->{realface} = $game{$gameid}{faces}[!$opts{winner}];
+    }
+
+    if ($opts{timeout}) {
+        $winmsg->{timeout} = $opts{timeout};
+        $winmsg->{realface} = $game{$gameid}{faces}[!$opts{winner}];
+        $losemsg->{timeout} = $opts{timeout};
+    }
+
+    $win->send($json->encode($winmsg));
+    $lose->send($json->encode($losemsg));
+
+    $win->finish();
+    $lose->finish();
 }
