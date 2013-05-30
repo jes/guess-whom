@@ -540,7 +540,7 @@ sub update_suggestable {
     my ($facetype) = @_;
 
     if ($db->{facetype}{$facetype}{name} ne 'Untitled'
-            && $db->{facetype}{$facetype}{nfaces} > 3) {
+            && $db->{facetype}{$facetype}{nfaces} >= 6) {
         $db->{game_suggestions}{$facetype} = 1;
     } else {
         delete $db->{game_suggestions}{$facetype};
