@@ -245,3 +245,15 @@ a:visited {
 .footer a:hover {
     color: #bbb;
 }
+
+.timer {
+    width: 100px;
+    height: 100px;
+    float: left;
+    margin-right: 5px;
+    border: solid #aaa 1px;
+    border-radius: 5px;
+    font-size: 40px;
+    vertical-align: middle;
+    text-align: center;
+}

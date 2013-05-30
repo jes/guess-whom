@@ -14,6 +14,7 @@
 </div>
 
 <div class="input">
+    <div class="timer" id="timer"></div>
     <p><b>State: </b><span id="state">Loading...</span></p>
 
     <div id="question-input">
@@ -29,7 +30,6 @@
         <button class="button" id="yes-button">Yes</button>
         <button class="button" id="no-button">No</button>
     </div>
-    </form>
 </div>
 
 <div class="faces" id="faces"></div>

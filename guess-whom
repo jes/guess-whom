@@ -325,6 +325,7 @@ websocket '/ws/game/:gameid' => sub {
                 $otherself->send($json->encode({state => 'answer', question => $msg->{text}}));
 
                 Mojo::IOLoop->remove($game{$gameid}{timer});
+                $_->send($json->encode({timer => $TURN_TIMER})) for @{ $game{$gameid}{websockets} };
                 $game{$gameid}{timer} = Mojo::IOLoop->timer($TURN_TIMER => sub {
                     end_game($gameid, winner => $playeridx, timeout => 1);
                 });
@@ -356,6 +357,7 @@ websocket '/ws/game/:gameid' => sub {
                 $otherself->send($json->encode({state => 'wait-question', answer => $answer}));
 
                 Mojo::IOLoop->remove($game{$gameid}{timer});
+                $_->send($json->encode({timer => $TURN_TIMER})) for @{ $game{$gameid}{websockets} };
                 $game{$gameid}{timer} = Mojo::IOLoop->timer($TURN_TIMER => sub {
                     end_game($gameid, winner => $playeridx, timeout => 1);
                 });
@@ -393,6 +395,7 @@ websocket '/ws/game/:gameid' => sub {
         $game{$gameid}{expect_from}[0] = 'question';
         $game{$gameid}{expect_from}[1] = 'silence';
 
+        $_->send($json->encode({timer => $TURN_TIMER})) for @{ $game{$gameid}{websockets} };
         $game{$gameid}{timer} = Mojo::IOLoop->timer($TURN_TIMER => sub {
             end_game($gameid,
                 winner => 1,
@@ -548,6 +551,8 @@ sub end_game {
     my ($gameid, %opts) = @_;
 
     Mojo::IOLoop->remove($game{$gameid}{timer});
+
+    return if !$game{$gameid};
 
     $game{$gameid}{finished} = 1;
     $db->{stats}{finished_games}++;

@@ -13,7 +13,15 @@ var statemap = {
     "wait-question": "Waiting for partner to ask a question...",
 };
 
-var state = 'loading';;
+var time_left = 0;
+var timer_running = {
+    "ask": true,
+    "answer": true,
+    "wait-answer": true,
+    "wait-question": true,
+};
+
+var state = 'loading';
 
 var faceid;
 var remaining_faces = nfaces - 1;
@@ -38,6 +46,15 @@ $('#no-button').click(function() {
 });
 
 set_state('connecting');
+
+self.setInterval(function() {
+    if (timer_running[state]) {
+        time_left -= 0.1;
+        update_timer();
+    } else {
+        reset_timer();
+    }
+}, 100);
 
 var ws = new WebSocket('ws://' + ws_hostname + '/ws/game/' + gameid);
 
@@ -89,6 +106,10 @@ ws.onmessage = function(msg) {
     if (d['faceid'] != undefined) {
         faceid = d['faceid'];
         draw_faces();
+    }
+
+    if (d['timer'] != undefined) {
+        time_left = d['timer'];
     }
 
     redraw_inputs();
@@ -195,4 +216,12 @@ function draw_faces() {
     $('#faces').html(html);
 
     $('#myface').html(facenames[faceid] + '<br><img src="/face/' + facetype + '/' + faceid + '.jpg">');
+}
+
+function reset_timer() {
+    $('#timer').html('');
+}
+
+function update_timer() {
+    $('#timer').html(parseInt(time_left) + "s");
 }
