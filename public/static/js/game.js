@@ -171,13 +171,11 @@ function set_state(s) {
 }
 
 function redraw_inputs() {
-    $('#input').attr('readonly', state != 'answer' && state != 'ask');
-    $('#victory').attr('disabled', state != 'answer' && state != 'ask');
-    $('#submitter').attr('disabled', state != 'answer' && state != 'ask');
-    $('#yes-button').attr('disabled', state != 'answer' && state != 'ask');
-    $('#no-button').attr('disabled', state != 'answer' && state != 'ask');
+    $('#question-input').css('display', 'none');
+    $('#victory-input').css('display', 'none');
+    $('#answer-input').css('display', 'none');
 
-    if (state == 'wait-partner' || state == 'wait-answer' || state == 'ask') {
+    if (state == 'ask') {
         if (remaining_faces == 1) {
             for (var i = 1; i <= nfaces; i++) {
                 if ($('#face' + i).css('opacity') >= 1) {
@@ -187,17 +185,13 @@ function redraw_inputs() {
                 }
             }
             $('#question-input').css('display', 'none');
-            $('#answer-input').css('display', 'none');
             $('#victory-input').css('display', 'block');
         } else {
             $('#question-input').css('display', 'block');
-            $('#answer-input').css('display', 'none');
             $('#victory-input').css('display', 'none');
         }
-    } else {
-        $('#question-input').css('display', 'none');
+    } else if (state == 'answer') {
         $('#answer-input').css('display', 'block');
-        $('#victory-input').css('display', 'none');
     }
 }
 
