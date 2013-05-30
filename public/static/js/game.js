@@ -5,7 +5,7 @@ var statemap = {
     "loading": "Loading...",
     "connected": "Connection established.",
     "connecting": "Connecting websocket...",
-    "ditched": "Other player lost connection",
+    "ditched": "Other player lost connection.",
     "disconnected": "Connection lost.",
     "victory": "Winner.",
     "wait-answer": "Waiting for partner to answer...",
