@@ -73,7 +73,8 @@ get '/' => sub {
 
     my @games = keys %{ $db->{game_suggestions} };
     my $facetype = $games[rand @games];
-    my $gamename = $db->{facetype}{$facetype}{name};
+    my $gamename;
+    $gamename = $db->{facetype}{$facetype}{name} if $facetype;
 
     $self->render('index', facetype => $facetype, gamename => $gamename);
 };
