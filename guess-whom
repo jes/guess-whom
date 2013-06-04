@@ -119,21 +119,24 @@ get '/games' => sub {
 get '/create-game' => sub {
     my $self = shift;
 
-    my $facetype = fresh_facetype();
-
-    $self->stash(creating => $facetype);
-
     $self->render('create-game');
 };
 
-post '/create-game/:facetype' => sub {
+post '/create-game' => sub {
     my $self = shift;
 
-    my $facetype = $self->param('facetype');
+    my $facetype = fresh_facetype();
     my $gamename = $self->param('gamename');
 
-    if (!defined $facetype || !defined $gamename) {
-        $self->render('error');
+    my $error = '';
+
+    if (!$gamename) {
+        $error = 'Please specify a name for the game.';
+    }
+
+    if ($error) {
+        $self->flash(error => $error);
+        $self->redirect_to('/create-game');
         return;
     }
 

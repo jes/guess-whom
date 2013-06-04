@@ -181,11 +181,16 @@ input {
 
 .alert {
     padding: 20px;
+    border: solid 1px;
+    border-radius: 10px;
 }
 .alert-info {
     background-color: #efe;
-    border: solid 1px #cdc;
-    border-radius: 10px;
+    border-color: #cdc;
+}
+.alert-error {
+    background-color: #fee;
+    border-color: #dcc;
 }
 
 .byline {

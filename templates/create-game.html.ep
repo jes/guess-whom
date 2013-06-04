@@ -2,9 +2,9 @@
 % title 'Create game';
 % layout 'default';
 
-<form action="/create-game/<%= $creating %>" method="post">
+<form action="/create-game" method="post">
     <label for="gamename">Game name:</label>
-    <input name="gamename" id="gamename" type="text" value="Untitled">
+    <input name="gamename" id="gamename" type="text" value="<%= param 'gamename' %>">
     <br>
 
     <button class="button" type="submit">Submit</button>
