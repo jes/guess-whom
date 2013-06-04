@@ -24,6 +24,12 @@ foreach my $field (qw(host ws_host passphrase db)) {
     die "no $field in config" unless exists $config->{$field};
 }
 
+if ($config->{passphrase} eq 'DEFAULT') {
+    warn " **********************************************************\n";
+    warn " *** You need to set up guess-whom; see guess-whom.conf ***\n";
+    warn " **********************************************************\n";
+}
+
 my $host = $config->{host};
 
 my $db = DBM::Deep->new($config->{db});
