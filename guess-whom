@@ -237,9 +237,7 @@ post '/add-faces/:facetype' => sub {
 get '/new-game' => sub {
     my $self = shift;
 
-    # TODO: offer a list of facetypes
-
-    $self->render('error');
+    $self->redirect_to('/games');
 };
 
 get '/new-game/:facetype' => sub {
@@ -256,13 +254,12 @@ get '/new-game/:facetype' => sub {
     $db->{stats}{newgames}++;
 
     my $gameid = new_game();
-
-    $self->stash(gameid => $gameid);
-
     $game{$gameid}{facetype} = $facetype;
     $game{$gameid}{faces} = [];
 
-    render_game($self);
+    $self->stash(gameid => $gameid);
+
+    $self->redirect_to("/game/$gameid");
 };
 
 get '/game/:gameid' => sub {
