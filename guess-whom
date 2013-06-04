@@ -431,7 +431,7 @@ app->start;
 sub new_game {
     my $id;
     do {
-        $id = sprintf("%08x08x", int(rand(2**32)), int(rand(2**32)));
+        $id = sprintf("%08x%08x", int(rand(2**32)), int(rand(2**32)));
     } while ($game{id});
 
     $game{$id} = {
@@ -484,7 +484,7 @@ sub fresh_facetype {
     my $facetype;
 
     do {
-        $facetype = sprintf("%08x08x", int(rand(2**32)), int(rand(2**32)));
+        $facetype = sprintf("%08x%08x", int(rand(2**32)), int(rand(2**32)));
     } while ($db->{facetype}{$facetype});
 
     return $facetype;
