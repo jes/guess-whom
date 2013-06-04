@@ -22,13 +22,13 @@
     <div class="wrapper3">
         <div class="main">
             <h2><%= title %></h2>
-            % if (my $error = flash 'error') {
+            % if (my $error = (flash('error') || stash('error'))) {
                 <div class="alert alert-error">
                 <%= $error %>
                 </div>
             % }
 
-            % if (my $info = flash 'info') {
+            % if (my $info = (flash('info') || stash('info'))) {
                 <div class="alert alert-info">
                 <%= $info %>
                 </div>

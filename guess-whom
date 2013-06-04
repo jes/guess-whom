@@ -160,7 +160,7 @@ get '/manage-game/:facetype' => sub {
     my $facetype = $self->param('facetype');
 
     if (!$self->session("managing.$facetype")) {
-        $self->render('error');
+        $self->render('error', error => "You're not managing that game.");
         return;
     }
 
@@ -178,7 +178,7 @@ post '/name-faces/:facetype' => sub {
     my $facetype = $self->param('facetype');
 
     if (!$self->session("managing.$facetype")) {
-        $self->render('error');
+        $self->render('error', error => "You're not managing that game.");
         return;
     }
 
@@ -198,7 +198,7 @@ get '/add-faces/:facetype' => sub {
     my $gamename = $db->{facetype}{$facetype}{name};
 
     if (!$self->session("managing.$facetype")) {
-        $self->render('error');
+        $self->render('error', error => "You're not managing that game.");
         return;
     }
 
@@ -211,7 +211,7 @@ post '/add-faces/:facetype' => sub {
     my $facetype = $self->param('facetype');
 
     if (!$self->session("managing.$facetype")) {
-        $self->render('error');
+        $self->render('error', error => "You're not managing that game.");
         return;
     }
 
@@ -228,7 +228,7 @@ post '/add-faces/:facetype' => sub {
     } sub {
         if ($@) {
             print STDERR "$@";
-            $self->render('error');
+            $self->render('error', error => "Something went wrong trying to process that image. Sorry!");
         } else {
             # TODO: inflect
             $self->flash(info => 'Now set the names for those faces.');
@@ -249,6 +249,8 @@ get '/new-game/:facetype' => sub {
     my $facetype = $self->param('facetype');
 
     if (!defined $facetype || !$db->{facetype}{$facetype} || $db->{facetype}{$facetype}{nfaces} < 2) {
+        # TODO: explain the error
+        # TODO: redirect to referer if it is on our hostname
         $self->render('error');
         $db->{stats}{failed_newgame_facetypes}++;
         return;
@@ -271,6 +273,7 @@ get '/game/:gameid' => sub {
     my $gameid = $self->param('gameid');
 
     if (!$game{$gameid} || $game{$gameid}{state} ne 'join') {
+        # TODO: explain the error
         $self->render('error');
         $db->{stats}{failed_joins}++;
         return;
