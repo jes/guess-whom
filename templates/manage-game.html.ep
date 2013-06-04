@@ -6,9 +6,9 @@
 <form action="/name-faces/<%= $facetype %>" method="post">
 <div class="faces">
 % for my $i (1 .. $nfaces) {
-<!-- TODO: delete faces -->
 <div class="face">
     <input class="facename" type="text" name="facename<%= $i %>" value="<%= $facenames->[$i] %>">
+    <button type="button" class="button" onclick="delete_face(<%= $i %>)">&times;</button>
     <br>
     <img src="/face/<%= $facetype %>/<%= $i %>.jpg">
 </div>
@@ -17,3 +17,9 @@
 <br>
 <button class="button" type="submit">Submit names</button>
 </form>
+
+<script type="text/javascript">
+    var facetype = '<%= $facetype %>';
+</script>
+
+<script type="text/javascript" src="/static/js/manage-game.js"></script>

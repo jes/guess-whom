@@ -237,6 +237,41 @@ post '/add-faces/:facetype' => sub {
     };
 };
 
+post '/delete-face/:facetype' => sub {
+    my $self = shift;
+
+    my $facetype = $self->param('facetype');
+
+    if (!$self->session("managing.$facetype")) {
+        $self->render('error', error => "You're not managing that game.");
+        return;
+    }
+
+    my $faceid = $self->param('faceid');
+
+    if ($faceid < 1 || $faceid > $db->{facetype}{$facetype}{nfaces}) {
+        $self->flash(error => 'Face ID out of range!');
+        $self->redirect_to("/manage-game/$facetype");
+        return;
+    }
+
+    # shuffle subsequent filenames and names along
+    for my $i ($faceid .. $db->{facetype}{$facetype}{nfaces}-1) {
+        my $i1 = $i+1;
+
+        $db->{facetype}{$facetype}{facenames}[$i] = $db->{facetype}{$facetype}{facenames}[$i1];
+
+        rename "public/face/$facetype/$i1.jpg", "public/face/$facetype/$i.jpg"
+            or die "Failed to do some renaming for $facetype $i1 -> $i"; # TODO: be friendlier to the user
+    }
+
+    pop @{ $db->{facetype}{$facetype}{facenames} };
+
+    $db->{facetype}{$facetype}{nfaces}--;
+
+    $self->redirect_to("/manage-game/$facetype");
+};
+
 get '/new-game' => sub {
     my $self = shift;
 
