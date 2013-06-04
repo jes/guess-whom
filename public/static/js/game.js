@@ -13,7 +13,7 @@ var statemap = {
     "wait-question": "Waiting for partner to ask a question...",
 };
 
-var time_left = 0;
+var timer_ends;
 var timer_running = {
     "ask": true,
     "answer": true,
@@ -49,8 +49,8 @@ set_state('connecting');
 
 self.setInterval(function() {
     if (timer_running[state]) {
-        time_left -= 0.1;
-        update_timer();
+        time_left = (timer_ends - (new Date().getTime()))/1000;
+        update_timer(time_left);
     } else {
         reset_timer();
     }
@@ -109,7 +109,7 @@ ws.onmessage = function(msg) {
     }
 
     if (d['timer'] != undefined) {
-        time_left = d['timer'];
+        timer_ends = new Date().getTime() + 1000*d['timer'];
     }
 
     redraw_inputs();
@@ -216,6 +216,7 @@ function reset_timer() {
     $('#timer').html('');
 }
 
-function update_timer() {
+function update_timer(time_left) {
+    console.log("time_left = " + time_left);
     $('#timer').html(parseInt(time_left) + "s");
 }
