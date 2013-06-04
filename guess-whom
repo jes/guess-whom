@@ -429,7 +429,10 @@ app->secret($config->{passphrase});
 app->start;
 
 sub new_game {
-    my $id = sprintf("%08x", int(rand(2**32)));
+    my $id;
+    do {
+        $id = sprintf("%08x08x", int(rand(2**32)), int(rand(2**32)));
+    } while ($game{id});
 
     $game{$id} = {
         state => 'join',
@@ -481,7 +484,7 @@ sub fresh_facetype {
     my $facetype;
 
     do {
-        $facetype = sprintf("%08x", int(rand(2**32)));
+        $facetype = sprintf("%08x08x", int(rand(2**32)), int(rand(2**32)));
     } while ($db->{facetype}{$facetype});
 
     return $facetype;
