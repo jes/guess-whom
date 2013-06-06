@@ -536,10 +536,9 @@ sub handle_uploaded_faces {
     $file->move_to($tmp_path);
 
     foreach my $face (@$faces) {
-        my ($cx, $cy, $radius) = @$face;
+        my ($cx, $cy, $diam) = @$face;
 
-        my ($tlx, $tly) = ($cx - $radius, $cy - $radius);
-        my $diam = 2 * $radius;
+        my ($tlx, $tly) = ($cx, $cy);
 
         my $image = Image::Magick->new;
         my $err = $image->Read($tmp_path);

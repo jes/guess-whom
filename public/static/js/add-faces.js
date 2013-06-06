@@ -78,7 +78,7 @@ function rerender() {
 }
 
 function draw_rectangle(ctx, f) {
-    ctx.fillRect(f[0] - f[2], f[1] - f[2], f[2]*2, f[2]*2);
+    ctx.fillRect(f[0], f[1], f[2], f[2]);
 }
 
 function scale(img, w, h) {
