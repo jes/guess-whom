@@ -10,7 +10,7 @@
     <input class="facename" type="text" name="facename<%= $i %>" value="<%= $facenames->[$i] %>">
     <button type="button" class="button" onclick="delete_face(<%= $i %>)">&times;</button>
     <br>
-    <img src="/face/<%= $facetype %>/<%= $i %>.jpg">
+    <img src="/face/<%= filename $facetype %>/<%= $i %>.jpg">
 </div>
 % }
 </div>

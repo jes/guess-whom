@@ -80,10 +80,10 @@ ws.onmessage = function(msg) {
                 history_add('opponent', 'self', '<b>Opponent:</b> It\'s ' + facenames[d['face']] + '.');
             }
             if (d['realface'] != undefined) {
-                $('#opponent-face').html(facenames[d['realface']] + '<br><img src="/face/' + facetype + '/' + d['realface'] + '.jpg">');
+                $('#opponent-face').html(facenames[d['realface']] + '<br><img src="/face/' + facetype + '/' + filenames[d['realface']] + '.jpg">');
                 history_add('sys', 'self', '<b>You won!</b> Your opponent\'s ' + singular + ' was <b>' + facenames[d['realface']] + '</b>.');
             } else {
-                $('#opponent-face').html(facenames[guessed_face] + '<br><img src="/face/' + facetype + '/' + guessed_face + '.jpg">');
+                $('#opponent-face').html(facenames[guessed_face] + '<br><img src="/face/' + facetype + '/' + filenames[guessed_face] + '.jpg">');
                 history_add('sys', 'self', '<b>You won!</b>');
             }
         } else if(d['state'] == 'defeat') {
@@ -92,7 +92,7 @@ ws.onmessage = function(msg) {
             } else if (oldstate == 'wait-question') {
                 history_add('opponent', 'self', '<b>Opponent:</b> It\'s ' + facenames[faceid] + '.');
             }
-            $('#opponent-face').html(facenames[d['face']] + '<br><img src="/face/' + facetype + '/' + d['face'] + '.jpg">');
+            $('#opponent-face').html(facenames[d['face']] + '<br><img src="/face/' + facetype + '/' + filenames[d['face']] + '.jpg">');
             history_add('sys', 'self', '<b>You lost!</b> Your opponent\'s ' + singular + ' was ' + facenames[d['face']] + '.');
         }
     }
@@ -205,11 +205,11 @@ function draw_faces() {
         if (i == faceid)
             continue;
 
-        html += '<div class="face" id="face' + i + '" onclick="toggle_face(' + i + ')">' + facenames[i] + '<br><img src="/face/' + facetype + '/' + i + '.jpg"></div>';
+        html += '<div class="face" id="face' + i + '" onclick="toggle_face(' + i + ')">' + facenames[i] + '<br><img src="/face/' + facetype + '/' + filenames[i] + '.jpg"></div>';
     }
     $('#faces').html(html);
 
-    $('#myface').html(facenames[faceid] + '<br><img src="/face/' + facetype + '/' + faceid + '.jpg">');
+    $('#myface').html(facenames[faceid] + '<br><img src="/face/' + facetype + '/' + filenames[faceid] + '.jpg">');
 }
 
 function reset_timer() {
@@ -217,6 +217,5 @@ function reset_timer() {
 }
 
 function update_timer(time_left) {
-    console.log("time_left = " + time_left);
     $('#timer').html(parseInt(time_left) + "s");
 }

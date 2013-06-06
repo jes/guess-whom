@@ -10,7 +10,7 @@
 %       for my $faceid (@faces) {
             <div class="face">
                 <%= facename $game, $faceid %><br>
-                <img src="/face/<%= $game %>/<%= $faceid %>.jpg">
+                <img src="/face/<%= $game %>/<%= filename $game, $faceid %>.jpg">
             </div>
 %       }
         </div>
