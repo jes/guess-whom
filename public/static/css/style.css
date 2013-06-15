@@ -262,3 +262,52 @@ a:visited {
     vertical-align: middle;
     text-align: center;
 }
+
+#lobby {
+    border: 1px solid black;
+    height: 500px;
+}
+
+#lobby-chat {
+    float: left;
+    border: 1px solid red;
+    width: 700px;
+}
+
+#lobby-userlist {
+    float: right;
+    border: 1px solid green;
+    width: 194px;
+    overflow-y: scroll;
+    height: 498px;
+}
+
+#lobby-text {
+    border: 1px solid blue;
+    overflow-y: scroll;
+    height: 464px;
+    font-family: monospace;
+}
+
+#lobby-input {
+    border: 1px solid black;
+    height: 30px;
+}
+
+#lobby-input input {
+    border: none;
+    height: 100%;
+    width: 650px;
+}
+
+#lobby-input button {
+    width: 40px;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    height: 28px;
+}
+
+.chat-sys {
+    color: #888;
+}

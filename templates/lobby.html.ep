@@ -1,0 +1,33 @@
+% title 'Lobby';
+% layout 'default';
+
+<a class="button" href="/new-game/<%= $facetype %>">Start game</a>
+
+<div id="lobby">
+    <div id="lobby-chat">
+        <div id="lobby-text"><div class="chat-sys">* Connecting to server...</div></div>
+        <div id="lobby-input">
+            <input id="chat-input" type="text">
+            <button class="button" onclick="send_chat()">Send</button>
+        </div>
+    </div>
+    <div id="lobby-userlist">
+    </div>
+    <div style="clear:both"></div>
+</div>
+
+<div class="faces">
+%   for my $faceid (1 .. nfaces $facetype) {
+    <div class="face">
+        <%= facename $facetype, $faceid %><br>
+        <img src="/face/<%= $facetype %>/<%= filename $facetype, $faceid %>.jpg">
+    </div>
+%   }
+</div>
+
+<script type="text/javascript">
+    var facetype = '<%= $facetype %>';
+    var ws_hostname = '<%= ws_hostname %>';
+</script>
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.min.js"></script>
+<script type="text/javascript" src="/static/js/lobby.js"></script>

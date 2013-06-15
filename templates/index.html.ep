@@ -3,4 +3,4 @@
 
 <p>You probably want to <a class="button" href="/create-game">create a game</a>.</p>
 <p>Or check out the <a class="button" href="/games">selection of games</a>.</p>
-<p>Alternatively, how about a game of <a class="button" href="/new-game/<%= $facetype %>"><%= $gamename %></a>?</p>
+<p>Alternatively, how about a game of <a class="button" href="/lobby/<%= $facetype %>"><%= $gamename %></a>?</p>

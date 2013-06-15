@@ -15,6 +15,7 @@ use POSIX qw(tmpnam);
 
 my %game;
 my %ws_clients;
+my %lobby;
 
 my $json = Mojo::JSON->new;
 
@@ -51,15 +52,27 @@ helper awwsnap => sub {
     return $AWWSNAP[rand @AWWSNAP];
 };
 
+helper ws_hostname => sub {
+    return $config->{ws_host};
+};
+
 helper gamename => sub {
     my ($self, $facetype) = @_;
     return $facetype ? $db->{facetype}{$facetype}{name} : '';
 };
 
+helper nfaces => sub {
+    my ($self, $facetype) = @_;
+
+    return () if !defined $facetype || !$db->{facetype}{$facetype};
+
+    return $db->{facetype}{$facetype}{nfaces};
+};
+
 helper faceids => sub {
     my ($self, $facetype) = @_;
 
-    return () if !defined $facetype;
+    return () if !defined $facetype || !$db->{facetype}{$facetype};
 
     my @faceids = shuffle (1 .. $db->{facetype}{$facetype}{nfaces});
 
@@ -69,7 +82,7 @@ helper faceids => sub {
 helper facename => sub {
     my ($self, $facetype, $faceid) = @_;
 
-    return '' if !defined $facetype or !defined $faceid;
+    return '' if !defined $facetype or !defined $faceid or !$db->{facetype}{$facetype} || $db->{facetype}{$facetype}{nfaces} < $faceid;
 
     return $db->{facetype}{$facetype}{facenames}[$faceid];
 };
@@ -77,7 +90,7 @@ helper facename => sub {
 helper filename => sub {
     my ($self, $facetype, $faceid) = @_;
 
-    return '' if !defined $facetype or !defined $faceid;
+    return '' if !defined $facetype or !defined $faceid or !$db->{facetype}{$facetype} || $db->{facetype}{$facetype}{nfaces} < $faceid;
 
     return $db->{facetype}{$facetype}{filenames}[$faceid];
 };
@@ -122,6 +135,58 @@ get '/games' => sub {
     my @games = (shuffle keys %{ $db->{game_suggestions} })[0 .. 4];
 
     $self->render('games', games => \@games);
+};
+
+get '/lobby' => sub {
+    my $self = shift;
+
+    $self->render('error', error => 'Not implemented!');
+};
+
+get '/lobby/:facetype' => sub {
+    my $self = shift;
+
+    my $facetype = $self->param('facetype');
+
+    if (!defined $facetype || !$db->{facetype}{$facetype}) {
+        # TODO: explain the error
+        # TODO: redirect to referer if it is on our hostname
+        $self->render('error');
+        return;
+    }
+
+    $self->render('lobby', facetype => $facetype);
+};
+
+websocket '/ws/lobby/:facetype' => sub {
+    my $self = shift;
+
+    my $facetype = $self->param('facetype');
+
+    $db->{stats}{ws_connects}++;
+
+    $ws_clients{$self} = $self;
+    $lobby{$facetype}{$self} = $self;
+
+    $self->on(message => sub {
+        my ($self, $msg_str) = @_;
+
+        print STDERR "Received message: $msg_str\n";
+
+        my $msg = $json->decode($msg_str);
+        if ($msg->{type} eq 'chat') {
+            my $output = $json->encode({type=>'chat', sender=>'SENDER', message=>$msg->{message}});
+            for my $client (values %{ $lobby{$facetype} }) {
+                next if $client == $self;
+                $client->send($output);
+            }
+        }
+    });
+
+    $self->on(finish => sub {
+        delete $ws_clients{$self};
+        delete $lobby{$facetype}{$self};
+    });
 };
 
 get '/create-game' => sub {
@@ -491,7 +556,6 @@ sub render_game {
 
     $self->stash(gameurl => "http://$host/game/" . $gameid);
     $self->stash(facetype => $facetype);
-    $self->stash(ws_hostname => $config->{ws_host});
 
     my @facenames = @{ $db->{facetype}{$facetype}{facenames} };
     my @filenames = @{ $db->{facetype}{$facetype}{filenames} };
