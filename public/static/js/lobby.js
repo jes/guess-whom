@@ -36,8 +36,10 @@ $('#chat-input').bind('keypress', function (e) {
 });
 
 function send_chat() {
-    ws.send(JSON.stringify({"type":"chat", "message":$('#chat-input').val()}));
-    add_output('self', '<b>&lt;You&gt;</b> ' + $('#chat-input').val());
-    $('#chat-input').val('');
+    if ($('#chat-input').val() !== '') {
+        ws.send(JSON.stringify({"type":"chat", "message":$('#chat-input').val()}));
+        add_output('self', '<b>&lt;You&gt;</b> ' + $('#chat-input').val());
+        $('#chat-input').val('');
+    }
     return false;
 }
