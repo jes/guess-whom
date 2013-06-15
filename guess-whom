@@ -165,6 +165,11 @@ websocket '/ws/lobby/:facetype' => sub {
 
     $db->{stats}{ws_connects}++;
 
+    my $jsonstr = $json->encode({type=>'join', joiner=>'JOINER'});
+    for my $client (values %{ $lobby{$facetype} }) {
+        $client->send($jsonstr);
+    }
+
     $ws_clients{$self} = $self;
     $lobby{$facetype}{$self} = $self;
 
@@ -186,6 +191,11 @@ websocket '/ws/lobby/:facetype' => sub {
     $self->on(finish => sub {
         delete $ws_clients{$self};
         delete $lobby{$facetype}{$self};
+
+        my $jsonstr = $json->encode({type=>'quit', quitter=>'QUITTER'});
+        for my $client (values %{ $lobby{$facetype} }) {
+            $client->send($jsonstr);
+        }
     });
 };
 

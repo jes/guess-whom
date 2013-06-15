@@ -9,8 +9,16 @@ ws.onmessage = function(msg) {
 
     var d = JSON.parse(msg.data);
 
-    if (d['type'] == 'chat') {
+    switch(d['type']) {
+    case 'chat':
         add_output('chat', '<b>&lt;' + d['sender'] + '&gt;</b> ' + d['message']);
+        break;
+    case 'join':
+        add_output('sys', '* ' + d['joiner'] + ' has joined the lobby');
+        break;
+    case 'quit':
+        add_output('sys', '* ' + d['quitter'] + ' has left the lobby');
+        break;
     }
 }
 
@@ -21,6 +29,11 @@ ws.onclose = function() {
 function add_output(type, html) {
     $('#lobby-text').html($('#lobby-text').html() + '<div class="chat-' + type + '">' + html + '</div>');
 }
+
+$('#chat-input').bind('keypress', function (e) {
+    if (e.keyCode === 13)
+        send_chat();
+});
 
 function send_chat() {
     ws.send(JSON.stringify({"type":"chat", "message":$('#chat-input').val()}));
